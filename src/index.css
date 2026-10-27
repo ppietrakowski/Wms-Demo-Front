@@ -12,7 +12,20 @@ code {
     monospace;
 }
 
-.navbar-dark-bg {
+.navbar-info-bg {
   background-color: rgb(0, 33, 68);
   color: whitesmoke;
+}
+
+.navbar-success-bg {
+  color: white;
+  background-color: #01631d;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: #f8f9fa !important;
+  /* Bardzo jasny szary zamiast niebieskiego */
+  color: #212529 !important;
+  /* Ciemny kolor tekstu */
+  box-shadow: none !important;
 }

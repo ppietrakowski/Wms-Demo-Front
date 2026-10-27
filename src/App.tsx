@@ -1,11 +1,27 @@
 import * as ReactRouter from 'react-router-dom'
 import { use, useEffect, useState } from 'react';
 
-function ApplicationHeader() {
-    return <header className='d-flex justify-content-center navbar navbar-expand-lg navbar-light navbar-dark-bg'>
+interface ApplicationHeaderProps {
+    operationStatus?: string
+}
+
+function ApplicationHeader({ operationStatus }: ApplicationHeaderProps) {
+
+    let style = {
+        filter: 'brightness(0.7)',
+        gridTemplateColumns: '1fr auto 1fr',
+    }
+
+    if (operationStatus == 'primary') {
+        style['color'] = 'white'
+    }
+
+    return <header className={`d-grid align-items-center navbar navbar-light bg-${operationStatus}-subtle px-3`} style={style}>
         <div></div>
-        <div>Home</div>
-        <div></div>
+        <div className='fw-bold text-center'>Home</div>
+        <div className='text-end'>
+            $User
+        </div>
     </header>
 }
 
@@ -15,43 +31,71 @@ interface ApplicationCategoryProps {
 }
 
 function ApplicationCategory({ name, children }: ApplicationCategoryProps) {
-    let id = 'collapse-' + name.split(' ')[0]
-    let raw_id = '#' + id
-
-    return <div className='nav-link'>
-        <button className='border-top border-1 w-100 p-2 fs-4' data-bs-toggle="collapse" data-bs-target={raw_id} aria-expanded="false" aria-controls={id} data-bs-offset="0,25" data-bs-display="static" type="button" >{name}</button>
-        <div className="collapse" id={id}>
-            {children}
+    const BsTargetId = `collapse${name}`
+    const HeaderId = `heading${name}`
+    return <div className='accordion rounded-0' id={name}>
+        <div className="accordion-item">
+            <h2 className="accordion-header" id={HeaderId}>
+                <button className="btn btn-light accordion-button collapsed rounded-0" type="button" data-bs-toggle="collapse" data-bs-target={`#${BsTargetId}`} aria-expanded="true" aria-controls={BsTargetId}>
+                    {name}
+                </button>
+            </h2>
+            <div id={BsTargetId} className="accordion-collapse collapse" aria-labelledby={HeaderId} data-bs-parent={`#${name}`}>
+                <div className="accordion-body">
+                    {children}
+                </div>
+            </div>
         </div>
-    </div>
+    </div >
 }
 
 function CategoryElement({ name }: ApplicationCategoryProps) {
-    return <button key={name.split(' ')[0]} className='nav-link border-top-1 border-secondary border-1 pt-2 justify-content-start'>{name} [Not Implemented]</button>
-}
-
-type CategoriesApp = {
-    [key: string]: string[]
+    return <button key={name.split(' ')[0]} className='btn py-2 px-3 d-flex justify-content-between align-items-center w-100 rounded-0'>
+        <span>{name}</span>
+        <span className="badge rounded-pill bg-warning-subtle">During implementation</span>
+    </button>
 }
 
 function SelectApplication() {
-    const Applications = ['Inbound', 'Outbound', 'Audit', 'Icqa', 'Settings']
-    const AppToCategories: CategoriesApp = {
-        'Inbound': ['Receive', 'Stow'],
-        'Outbound': ['Pick', 'Ship'],
-        'Audit': ['Count Location Items'],
-        'Icqa': ['Check location', 'Locator'],
-        'Settings': []
-    }
+    return <div className='vw-100'>
+        <ApplicationCategory name='Inbound'>
+            <CategoryElement name='Receive' />
+            <CategoryElement name='Stow' />
+        </ApplicationCategory>
+        <ApplicationCategory name='Outbound'>
+            <CategoryElement name='Pick' />
+            <CategoryElement name='Ship' />
+        </ApplicationCategory>
+        <ApplicationCategory name='ICQA'>
+            <CategoryElement name='FC Research' />
+            <CategoryElement name='Count products in location' />
+        </ApplicationCategory>
+        <ApplicationCategory name='Utilities'>
+            <CategoryElement name='Display code128' />
+            <CategoryElement name='Print code128' />
+            <CategoryElement name='[Debug] Display inline message' />
+        </ApplicationCategory>
+    </div>
+}
 
-    return <div className='d-flex justify-content-start vw-100 flex-column border-bottom border-1'>
-        {Applications.map(v => <ApplicationCategory name={v}>{AppToCategories[v].map(e => <CategoryElement name={e} />)} </ApplicationCategory>)}
+interface InlineMessageProps {
+    message: string
+    type: string
+}
+
+function InlineMessage({ message, type }: InlineMessageProps) {
+    return <div className={`alert alert-${type} rounded-0 border-0`}>
+        {message}
     </div>
 }
 
 function Application() {
+
+    let [message, setMessage] = useState<string>('')
+
     return <div>
-        <ApplicationHeader />
+        <ApplicationHeader operationStatus='primary' />
+        {message && <InlineMessage message='Testing messages' type='primary' />}
         <SelectApplication />
     </div>
 }
