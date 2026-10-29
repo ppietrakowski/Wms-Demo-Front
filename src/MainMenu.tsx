@@ -45,6 +45,10 @@ function CategoryElement({ name, redirectionAddress }: CategoryElementProps) {
     </ReactRouter.Link>
 }
 
+export interface User {
+
+}
+
 function SelectApplication() {
     return <div className='vw-100'>
         <ApplicationCategory name='Inbound'>
