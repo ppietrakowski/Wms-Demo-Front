@@ -1,5 +1,6 @@
 import { CSSProperties, ReactNode, use, useEffect, useState } from 'react';
 import * as ReactRouter from 'react-router-dom'
+import { api } from './Api.tsx';
 
 interface ApplicationHeaderProps {
     operationStatus?: string
@@ -39,6 +40,16 @@ export function DropDown({ children, icon, label, dropdownOnRightSide = false }:
     </div>
 }
 
+async function handleLogout() {
+    try {
+        await api.post('logout/');
+
+        // trick to browser route to reset
+        window.location.reload()
+    } catch (err) {
+    }
+}
+
 export function ApplicationHeader({ operationStatus, header, displayOptionsMenu, children }: ApplicationHeaderProps) {
 
     let style: CSSProperties = {
@@ -56,11 +67,11 @@ export function ApplicationHeader({ operationStatus, header, displayOptionsMenu,
                 (
                     <DropDown icon='fa fa-bars'>
                         <ReactRouter.Link className='dropdown-item fs-6' to={'/'}>Menu</ReactRouter.Link>
-                        <ReactRouter.Link className='dropdown-item fs-6' to={'/logout'}>Logout</ReactRouter.Link>
+                        <button className='dropdown-item fs-6' onClick={() => handleLogout()}>Logout</button>
                         {children}
                     </DropDown>
                 ) :
-                (<div></div>)
+                (<button className='text-white dropdown-item fs-6' onClick={() => handleLogout()}><span className='fa fa-sign-out'></span></button>)
         }
 
         <div className='fw-bold text-center'>{header}</div>

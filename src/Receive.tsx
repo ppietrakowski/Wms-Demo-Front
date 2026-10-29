@@ -5,6 +5,7 @@ import { InlineMessage, InlineMessageSettings } from './InlineMessage.tsx';
 import { Form } from './Form.tsx';
 import InputText from './InputText.tsx';
 import { User } from './MainMenu.tsx';
+import { AuthenticatedUserProps } from './Login.tsx';
 
 enum ReceiveStage {
     SCAN_SHIP_ID = 0,
@@ -14,8 +15,7 @@ enum ReceiveStage {
     SCAN_PROBLEM_TOTE,
 }
 
-interface ReceiveProps {
-    user?: User
+interface ReceiveProps extends AuthenticatedUserProps {
     setStage: React.Dispatch<React.SetStateAction<ReceiveStage>>
 }
 
@@ -47,12 +47,12 @@ function ReceiveItemID({ user, setStage }: ReceiveProps) {
     </div>
 }
 
-export function Receive() {
+export function Receive({ user }: AuthenticatedUserProps) {
 
     let [stage, setStage] = useState(0)
 
     return <div>
-        {(stage == ReceiveStage.SCAN_SHIP_ID) && <ReceiveScanID setStage={setStage} />}
-        {(stage == ReceiveStage.SCAN_ITEM_ID) && <ReceiveItemID setStage={setStage} />}
+        {(stage == ReceiveStage.SCAN_SHIP_ID) && <ReceiveScanID user={user} setStage={setStage} />}
+        {(stage == ReceiveStage.SCAN_ITEM_ID) && <ReceiveItemID user={user} setStage={setStage} />}
     </div>
 }

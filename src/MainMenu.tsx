@@ -2,6 +2,7 @@ import { CSSProperties, ReactNode, use, useEffect, useState } from 'react';
 import * as ReactRouter from 'react-router-dom'
 import { ApplicationHeader } from './ApplicationHeader.tsx';
 import { InlineMessage } from './InlineMessage.tsx';
+import { AuthenticatedUserProps } from './Login.tsx';
 
 interface ApplicationCategoryProps {
     name: string
@@ -73,11 +74,11 @@ function SelectApplication() {
 
 
 
-export function MainMenu() {
+export function MainMenu({ user }: AuthenticatedUserProps) {
     let [message, setMessage] = useState<string>('')
 
     return <div>
-        <ApplicationHeader header='Home' operationStatus='primary' />
+        <ApplicationHeader header='Home' operationStatus='primary' displayOptionsMenu={false} />
         {message && <InlineMessage message='Testing messages' type='primary' />}
         <SelectApplication />
     </div>

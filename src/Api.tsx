@@ -1,7 +1,7 @@
 // src/api.js
 import axios from 'axios';
 
-const api = axios.create({
+export const api = axios.create({
     baseURL: `https://abrasion-unbent-leotard.ngrok-free.dev/api/`,
     withCredentials: true, // MUST be true so cookies are automatically sent with every request
     headers: {
@@ -36,5 +36,3 @@ api.interceptors.response.use(
         return Promise.reject(error);
     }
 );
-
-export default api;
