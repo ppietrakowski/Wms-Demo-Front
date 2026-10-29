@@ -77,8 +77,9 @@ function SelectApplication() {
 export function MainMenu({ user }: AuthenticatedUserProps) {
     let [message, setMessage] = useState<string>('')
 
+    console.log(user)
     return <div>
-        <ApplicationHeader header='Home' operationStatus='primary' displayOptionsMenu={false} />
+        <ApplicationHeader user={user} header='Home' operationStatus='primary' displayOptionsMenu={false} />
         {message && <InlineMessage message='Testing messages' type='primary' />}
         <SelectApplication />
     </div>

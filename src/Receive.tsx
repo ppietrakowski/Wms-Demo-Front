@@ -22,7 +22,7 @@ interface ReceiveProps extends AuthenticatedUserProps {
 function ReceiveScanID({ user, setStage }: ReceiveProps) {
     let [message, setMessage] = useState<InlineMessageSettings>({ type: 'danger' })
 
-    return <div><ApplicationHeader header='Receive' operationStatus='primary' displayOptionsMenu={true} />
+    return <div><ApplicationHeader user={user} header='Receive' operationStatus='primary' displayOptionsMenu={true} />
         {message.message && <InlineMessage message={message.message} type={message.type} />}
         <Form positionedAtCentered={true} submitCallback={() => setStage(ReceiveStage.SCAN_ITEM_ID)}>
             <InputText type='text' submitElementKey='ship_id' maxLength={12}>
@@ -35,7 +35,7 @@ function ReceiveScanID({ user, setStage }: ReceiveProps) {
 function ReceiveItemID({ user, setStage }: ReceiveProps) {
     let [message, setMessage] = useState<InlineMessageSettings>({ type: 'danger' })
 
-    return <div><ApplicationHeader header='Receive' operationStatus='primary' displayOptionsMenu={true}>
+    return <div><ApplicationHeader user={user} header='Receive' operationStatus='primary' displayOptionsMenu={true}>
         <button className='dropdown-item fs-6'>Report problem</button>
     </ApplicationHeader>
         {message.message && <InlineMessage message={message.message} type={message.type} />}

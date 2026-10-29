@@ -24,7 +24,7 @@ export interface AuthenticatedUserProps {
 
 export function Login({ onLoginSuccess, onLoginFailure }: LoginSettings) {
     const [credentials, setCredentials] = useState({ username: '', password: '' });
-    const [inlineMessage, setInlineMessage] = React.useState<InlineMessageSettings>({ message: '', type: '' })
+    const [inlineMessage, setInlineMessage] = React.useState<InlineMessageSettings>({ type: '' })
 
     const handleLogin = async (e: FormSubmitEvent) => {
         try {
@@ -37,7 +37,7 @@ export function Login({ onLoginSuccess, onLoginFailure }: LoginSettings) {
         } catch (err) {
             setInlineMessage({
                 message: `${getErrorMessage(err)}`,
-                type: 'error'
+                type: 'danger'
             })
             onLoginFailure && onLoginFailure(err as Error)
         }
@@ -46,7 +46,7 @@ export function Login({ onLoginSuccess, onLoginFailure }: LoginSettings) {
 
     return (
         <div>
-            {inlineMessage.message ? (<InlineMessage message={inlineMessage.message} tag={inlineMessage.type} />) : (<></>)}
+            {inlineMessage.message ? (<InlineMessage message={inlineMessage.message} type={inlineMessage.type} />) : (<></>)}
             <Form submitCallback={handleLogin} positionedAtCentered={true}>
                 <InputText
                     type="text"

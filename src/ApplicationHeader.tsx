@@ -1,12 +1,14 @@
 import { CSSProperties, ReactNode, use, useEffect, useState } from 'react';
 import * as ReactRouter from 'react-router-dom'
 import { api } from './Api.tsx';
+import { UserData } from './Login';
 
 interface ApplicationHeaderProps {
     operationStatus?: string
     header: string
     displayOptionsMenu?: boolean
     children?: ReactNode | ReactNode[]
+    user: UserData
 }
 
 interface DropDownSettings {
@@ -50,7 +52,7 @@ async function handleLogout() {
     }
 }
 
-export function ApplicationHeader({ operationStatus, header, displayOptionsMenu, children }: ApplicationHeaderProps) {
+export function ApplicationHeader({ user, operationStatus, header, displayOptionsMenu, children }: ApplicationHeaderProps) {
 
     let style: CSSProperties = {
         filter: 'brightness(0.9)',
@@ -76,7 +78,7 @@ export function ApplicationHeader({ operationStatus, header, displayOptionsMenu,
 
         <div className='fw-bold text-center'>{header}</div>
         <div className='text-end'>
-            $User
+            {user.username}
         </div>
     </header >
 }
