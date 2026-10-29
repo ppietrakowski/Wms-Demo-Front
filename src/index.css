@@ -12,20 +12,14 @@ code {
     monospace;
 }
 
-.navbar-info-bg {
-  background-color: rgb(0, 33, 68);
-  color: whitesmoke;
-}
-
-.navbar-success-bg {
-  color: white;
-  background-color: #01631d;
-}
-
 .accordion-button:not(.collapsed) {
-  background-color: #f8f9fa !important;
-  /* Bardzo jasny szary zamiast niebieskiego */
-  color: #212529 !important;
-  /* Ciemny kolor tekstu */
+  background-color: #2b3035 !important;
+  /* Nieco jaśniejszy grafit */
+  color: #fff !important;
   box-shadow: none !important;
+}
+
+/* To samo dla ikoni/strzałki w akordeonie, żeby nie dostawała dziwnych kolorów */
+.accordion-button:not(.collapsed)::after {
+  filter: brightness(1.5);
 }
