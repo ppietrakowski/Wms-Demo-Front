@@ -23,3 +23,10 @@ code {
 .accordion-button:not(.collapsed)::after {
   filter: brightness(1.5);
 }
+
+.dropdown-menu,
+.custom-dropdown {
+  z-index: 1050 !important;
+  /* Wyrzuca menu na samą górę */
+  position: absolute;
+}

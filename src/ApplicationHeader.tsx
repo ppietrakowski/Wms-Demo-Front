@@ -19,19 +19,14 @@ interface DropDownSettings {
 }
 
 export function DropDown({ children, icon, label, dropdownOnRightSide = false }: DropDownSettings) {
-    let className = 'dropdown-menu p-2 rounded-1'
-
-    if (dropdownOnRightSide) {
-        className += ' dropdown-menu-end'
-    }
-
+    let className = 'dropdown-menu p-2 rounded-1 shadow'
     let iconDiv = <span>{label}</span>
 
     if (icon) {
         iconDiv = <i className={icon}></i>
     }
 
-    return <div className="position-relative">
+    return <div className="" >
         <ReactRouter.Link className="nav-link" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" to="" aria-expanded="false">
             {iconDiv}
         </ReactRouter.Link>
@@ -57,6 +52,8 @@ export function ApplicationHeader({ user, operationStatus, header, displayOption
     let style: CSSProperties = {
         filter: 'brightness(0.9)',
         gridTemplateColumns: '1fr auto 1fr',
+        /* Workaround for alerts */
+        zIndex: 1660
     }
 
     if (operationStatus == 'primary') {

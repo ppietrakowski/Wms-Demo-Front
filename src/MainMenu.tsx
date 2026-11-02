@@ -41,7 +41,7 @@ function CategoryElement({ name, redirectionAddress }: CategoryElementProps) {
         </button>
     }
 
-    return <ReactRouter.Link to={'/receive'} className='btn py-2 px-3 d-flex justify-content-between align-items-center w-100 rounded-0'>
+    return <ReactRouter.Link to={redirectionAddress} className='btn py-2 px-3 d-flex justify-content-between align-items-center w-100 rounded-0'>
         {name}
     </ReactRouter.Link>
 }
@@ -53,8 +53,9 @@ export interface User {
 function SelectApplication() {
     return <div className='vw-100'>
         <ApplicationCategory name='Inbound'>
-            <CategoryElement name='Receive' redirectionAddress='receive' />
-            <CategoryElement name='Stow' />
+            <CategoryElement name='Receive' redirectionAddress='/receive' />
+            <CategoryElement name='Stow' redirectionAddress='/stow' />
+            <CategoryElement name='Move to dropzone' redirectionAddress='/move-dropzone' />
         </ApplicationCategory>
         <ApplicationCategory name='Outbound'>
             <CategoryElement name='Pick' />

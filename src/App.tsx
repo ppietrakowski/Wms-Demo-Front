@@ -4,6 +4,8 @@ import { Receive } from './Receive.tsx';
 import { Login, UserData } from './Login.tsx';
 import { use, useEffect, useState } from 'react';
 import { api } from './Api.tsx';
+import { MoveToDropzone } from './MoveToDropZone.tsx';
+import { Stow } from './Stow.tsx';
 
 
 
@@ -57,6 +59,8 @@ function Application() {
                 element={<MainMenu user={user} />}
             />
             <ReactRouter.Route path='/receive' element={<Receive user={user} />} />
+            <ReactRouter.Route path='/move-dropzone' element={<MoveToDropzone user={user} />} />
+            <ReactRouter.Route path='/stow' element={<Stow user={user} />} />
 
             <ReactRouter.Route path='/login' element={<ReactRouter.Navigate to='/menu' replace />} />
 

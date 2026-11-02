@@ -22,7 +22,7 @@ export default function InputText({ submitElementKey, className, type, defaultVa
         <div className="input-group">
             <input id={submitElementKey} className="form-control form-control-lg" type={type} name={submitElementKey} onChange={e => {
                 onChange && onChange(e)
-            }} maxLength={maxLength} placeholder={placeholder || ''} defaultValue={defaultValue || ''} autoComplete={'off'} />
+            }} maxLength={maxLength} placeholder={placeholder || ''} defaultValue={defaultValue || ''} autoComplete={'off'} autoFocus={true} />
         </div>
     </div >
 }
