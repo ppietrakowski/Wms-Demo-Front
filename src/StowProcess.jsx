@@ -140,7 +140,7 @@ export function Stow({ user }) {
                 const containers = v.data['containers']
                 setFormData({ ...formData, containers, continue: true })
                 if (containers.length > 0) {
-                    setStage(2)
+                    setStage(STOW_SCAN_CONTAINER)
                 }
 
                 setLoading(false)
