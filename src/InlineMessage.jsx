@@ -1,15 +1,6 @@
 
-export interface InlineMessageSettings {
-    message?: string
-    type: string
-}
 
-interface InlineMessageProps {
-    message: string
-    type: string
-}
-
-function getIconForMessage(type: string) {
+function getIconForMessage(type) {
     const icons = {
         'primary': (<svg className="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"><use xlinkHref="#info-fill" /></svg>),
         'success': (<svg className="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlinkHref="#check-circle-fill" /></svg>),
@@ -20,7 +11,7 @@ function getIconForMessage(type: string) {
     return icons[type] || <div></div>
 }
 
-export function InlineMessage({ message, type }: InlineMessageProps) {
+export function InlineMessage({ message, type }) {
     if (type == 'info') {
         type = 'primary'
     }

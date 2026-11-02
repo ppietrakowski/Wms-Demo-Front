@@ -1,17 +1,6 @@
-export interface InputTextProps {
-    submitElementKey?: string
-    maxLength?: number
-
-    placeholder?: string
-    defaultValue?: string
-    children?: React.ReactNode | React.ReactNode[]
-    type: 'text' | 'password'
-    className?: string
-    onChange?: (e: any) => void
-}
 
 /** Scan ID button on center just to normalize first ones inputs in various apps */
-export default function InputText({ submitElementKey, className, type, defaultValue, placeholder, onChange, maxLength, children }: InputTextProps) {
+export default function InputText({ submitElementKey, className, type, defaultValue, placeholder, onChange, maxLength, children }) {
     submitElementKey = submitElementKey || ''
     maxLength = maxLength || 100
 

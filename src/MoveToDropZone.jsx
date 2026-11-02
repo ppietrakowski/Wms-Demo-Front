@@ -1,31 +1,13 @@
 import React, { useState } from "react";
-import { ApplicationHeader } from "./ApplicationHeader.tsx";
-import { Form, FormSubmitEvent } from "./Form.tsx";
-import { AuthenticatedUserProps } from "./Login.tsx";
-import InputText from "./InputText.tsx";
-import { api } from "./Api.tsx";
-import { InlineMessage, InlineMessageSettings } from "./InlineMessage.tsx";
+import { ApplicationHeader } from "./ApplicationHeader.jsx";
+import { Form } from "./Form.jsx";
+import InputText from "./InputText.jsx";
+import { api } from "./api.jsx";
+import { InlineMessage } from "./InlineMessage.jsx";
 
-interface Props {
-    containerId: string
-    setContainerId: React.Dispatch<React.SetStateAction<string>>
-    setStage: React.Dispatch<React.SetStateAction<number>>
-    setMessage: React.Dispatch<React.SetStateAction<InlineMessageSettings>>
-}
-
-function ScanContainerId({ setContainerId, setStage }: Props) {
-    function onSubmit(e: FormSubmitEvent) {
-        setContainerId(e.getString('container_id'))
-        setStage(1)
-    }
-
-    return <Form positionedAtCentered={true} submitCallback={e => onSubmit(e)}>
-        <InputText maxLength={12} type="text" submitElementKey='container_id'>Scan Container Id</InputText>
-    </Form>
-}
 
 function ScanDropzone({ setStage, formData, setMessage }) {
-    async function onSubmit(e: FormSubmitEvent) {
+    async function onSubmit(e) {
         const id = e.getString('dropzone')
 
         const response = await api.post('move-dropzone', {
@@ -144,17 +126,17 @@ function ScanContainers({ setMessage, setFormData, formData, setStage }) {
 
 
 
-export function MoveToDropzone({ user }: AuthenticatedUserProps) {
+export function MoveToDropzone({ user }) {
 
     let [stage, setStage] = useState(0)
     let [formData, setFormData] = useState({})
-    let [message, setMessage] = useState<InlineMessageSettings>({ type: '' })
+    let [message, setMessage] = useState({ type: '' })
 
     return <div>
         <ApplicationHeader header="Move to dropzone" user={user} displayOptionsMenu={true} operationStatus="primary">
         </ApplicationHeader>
         {message.message && <InlineMessage message={message.message} type={message.type} />}
-        {(stage == 0) && <ScanContainers setMessage={setMessage} setFormData={formData} setStage={setStage} setFormData={setFormData} />}
+        {(stage == 0) && <ScanContainers setMessage={setMessage} setFormData={formData} setStage={setStage} />}
         {(stage == 1) && <ScanDropzone setMessage={setMessage} formData={formData} setStage={setStage} />}
     </div>
 }

@@ -1,43 +1,24 @@
-import * as React from 'react';
-import { JSXElementConstructor } from 'react';
-
 export class FormSubmitEvent {
-    _target: HTMLFormElement
-    _formData: FormData
-
-    constructor(target: HTMLFormElement) {
+    constructor(target) {
         this._target = target
         this._formData = new FormData(this._target)
     }
 
-    getString(id: string): string {
+    getString(id) {
         return this._formData.get(id)?.toString() || ''
     }
 
-    getNumber(id: string): number {
+    getNumber(id) {
         return Number(this.getString(id) || 0)
     }
 
-    public get target(): HTMLFormElement {
+    get target() {
         return this._target
     }
 }
 
-interface FormSubmitCallback {
-    (event: FormSubmitEvent): void
-}
 
-
-interface FormOptions {
-    /** If true it's absolute positioned on center, on placement position otherwise */
-    positionedAtCentered?: boolean
-    submitCallback?: FormSubmitCallback
-    children?: React.ReactNode | React.ReactNode[]
-    method?: string
-}
-
-
-export function Form({ children, method, submitCallback, positionedAtCentered }: FormOptions) {
+export function Form({ children, method, submitCallback, positionedAtCentered }) {
     let formClasses = 'vw-100 position-absolute top-50 start-50 translate-middle max-w-md d-flex justify-content-center align-items-center'
 
     if (!positionedAtCentered) {

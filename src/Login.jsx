@@ -1,32 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { api } from './Api.tsx';
-import { Form, FormSubmitEvent } from './Form.tsx';
-import InputText from './InputText.tsx';
-import { FormButton } from './FormButton.tsx';
-import { InlineMessage, InlineMessageSettings } from './InlineMessage.tsx';
-import { getErrorMessage } from './apiGetMessage.tsx';
+import { api } from './api.jsx';
+import { Form } from './Form.jsx';
+import InputText from './InputText.jsx';
+import { FormButton } from './FormButton.jsx';
+import { InlineMessage } from './InlineMessage.jsx';
+import { getErrorMessage } from './apiGetMessage.jsx';
 
-export interface UserData {
-    username: string
-    roles: string[]
-    id: number
-}
 
-interface LoginSettings {
-    onLoginSuccess: (userData: UserData) => void
-    onLoginFailure?: (error: Error) => void
-}
-
-export interface AuthenticatedUserProps {
-    user: UserData
-}
-
-export function Login({ onLoginSuccess, onLoginFailure }: LoginSettings) {
+export function Login({ onLoginSuccess, onLoginFailure }) {
     const [credentials, setCredentials] = useState({ username: '', password: '' });
-    const [inlineMessage, setInlineMessage] = React.useState<InlineMessageSettings>({ type: '' })
+    const [inlineMessage, setInlineMessage] = React.useState({ type: '' })
 
-    const handleLogin = async (e: FormSubmitEvent) => {
+    const handleLogin = async (e) => {
         try {
             // ask for token
             await api.post('token/', credentials);
@@ -39,7 +25,7 @@ export function Login({ onLoginSuccess, onLoginFailure }: LoginSettings) {
                 message: `${getErrorMessage(err)}`,
                 type: 'danger'
             })
-            onLoginFailure && onLoginFailure(err as Error)
+            onLoginFailure && onLoginFailure(err)
         }
     };
 

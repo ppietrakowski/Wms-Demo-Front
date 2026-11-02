@@ -1,6 +1,4 @@
 
-import { Axios, AxiosError } from "axios";
-
 export function getErrorMessage(error) {
     if (!error.response) {
         // Network failure, backend down, or CORS issue

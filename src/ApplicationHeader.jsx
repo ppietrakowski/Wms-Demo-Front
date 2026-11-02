@@ -1,24 +1,7 @@
-import { CSSProperties, ReactNode, use, useEffect, useState } from 'react';
 import * as ReactRouter from 'react-router-dom'
-import { api } from './Api.tsx';
-import { UserData } from './Login';
+import { api } from './api.jsx';
 
-interface ApplicationHeaderProps {
-    operationStatus?: string
-    header: string
-    displayOptionsMenu?: boolean
-    children?: ReactNode | ReactNode[]
-    user: UserData
-}
-
-interface DropDownSettings {
-    icon: string | undefined
-    label?: string
-    dropdownOnRightSide?: boolean
-    children?: ReactNode | ReactNode[]
-}
-
-export function DropDown({ children, icon, label, dropdownOnRightSide = false }: DropDownSettings) {
+export function DropDown({ children, icon, label, dropdownOnRightSide = false }) {
     let className = 'dropdown-menu p-2 rounded-1 shadow'
     let iconDiv = <span>{label}</span>
 
@@ -47,9 +30,9 @@ async function handleLogout() {
     }
 }
 
-export function ApplicationHeader({ user, operationStatus, header, displayOptionsMenu, children }: ApplicationHeaderProps) {
+export function ApplicationHeader({ user, operationStatus, header, displayOptionsMenu, children }) {
 
-    let style: CSSProperties = {
+    let style = {
         filter: 'brightness(0.9)',
         gridTemplateColumns: '1fr auto 1fr',
         /* Workaround for alerts */

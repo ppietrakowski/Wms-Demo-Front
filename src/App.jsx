@@ -1,16 +1,16 @@
 import * as ReactRouter from 'react-router-dom'
-import { MainMenu } from './MainMenu.tsx';
-import { Receive } from './Receive.tsx';
-import { Login, UserData } from './Login.tsx';
+import { MainMenu } from './MainMenu.jsx';
+import { Receive } from './ReceiveProcess.jsx';
+import { Login } from './Login.jsx';
 import { use, useEffect, useState } from 'react';
-import { api } from './Api.tsx';
-import { MoveToDropzone } from './MoveToDropZone.tsx';
-import { Stow } from './Stow.tsx';
+import { api } from './api.jsx';
+import { MoveToDropzone } from './MoveToDropZone.jsx';
+import { Stow } from './StowProcess.jsx';
 
 
 
 function Application() {
-    const [user, setUser] = useState<UserData | null>(null);
+    const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     useEffect(() => {
         api.get('authuser/')

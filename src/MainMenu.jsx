@@ -1,15 +1,9 @@
 import { CSSProperties, ReactNode, use, useEffect, useState } from 'react';
 import * as ReactRouter from 'react-router-dom'
-import { ApplicationHeader } from './ApplicationHeader.tsx';
-import { InlineMessage } from './InlineMessage.tsx';
-import { AuthenticatedUserProps } from './Login.tsx';
+import { ApplicationHeader } from './ApplicationHeader.jsx';
 
-interface ApplicationCategoryProps {
-    name: string
-    children?: React.ReactNode | React.ReactNode[]
-}
 
-function ApplicationCategory({ name, children }: ApplicationCategoryProps) {
+function ApplicationCategory({ name, children }) {
     const BsTargetId = `collapse${name}`
     const HeaderId = `heading${name}`
     return <div className='accordion accordion-flush border-bottom border-gray-600' id={name}>
@@ -28,11 +22,7 @@ function ApplicationCategory({ name, children }: ApplicationCategoryProps) {
     </div >
 }
 
-interface CategoryElementProps extends ApplicationCategoryProps {
-    redirectionAddress?: string
-}
-
-function CategoryElement({ name, redirectionAddress }: CategoryElementProps) {
+function CategoryElement({ name, redirectionAddress }) {
 
     if (!redirectionAddress) {
         return <button key={name.split(' ')[0]} className='btn py-2 px-3 d-flex justify-content-between align-items-center w-100 rounded-0'>
@@ -44,10 +34,6 @@ function CategoryElement({ name, redirectionAddress }: CategoryElementProps) {
     return <ReactRouter.Link to={redirectionAddress} className='btn py-2 px-3 d-flex justify-content-between align-items-center w-100 rounded-0'>
         {name}
     </ReactRouter.Link>
-}
-
-export interface User {
-
 }
 
 function SelectApplication() {
@@ -75,10 +61,9 @@ function SelectApplication() {
 
 
 
-export function MainMenu({ user }: AuthenticatedUserProps) {
-    let [message, setMessage] = useState<string>('')
+export function MainMenu({ user }) {
+    let [message, setMessage] = useState('')
 
-    console.log(user)
     return <div>
         <ApplicationHeader user={user} header='Home' operationStatus='primary' displayOptionsMenu={false} />
         {message && <InlineMessage message='Testing messages' type='primary' />}

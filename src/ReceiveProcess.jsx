@@ -1,52 +1,26 @@
-import { CSSProperties, ReactNode, use, useEffect, useState } from 'react';
 import * as ReactRouter from 'react-router-dom'
-import { ApplicationHeader } from './ApplicationHeader.tsx';
-import { InlineMessage, InlineMessageSettings } from './InlineMessage.tsx';
-import { Form, FormSubmitEvent } from './Form.tsx';
-import InputText from './InputText.tsx';
-import { User } from './MainMenu.tsx';
-import { AuthenticatedUserProps } from './Login.tsx';
-import axios, { AxiosError } from 'axios';
-import { api } from './Api.tsx';
+import { ApplicationHeader } from './ApplicationHeader.jsx';
+import { InlineMessage } from './InlineMessage.jsx';
+import { Form } from './Form.jsx';
+import InputText from './InputText.jsx';
+import { api } from './api.jsx';
+import React from 'react';
+import { useState } from 'react';
 
-enum ReceiveStage {
-    SCAN_SHIP_ID = 0,
-    SCAN_ITEM_ID,
-    SCAN_TOTE_ID,
-    SCAN_PROBLEM_CODE,
-    DISPLAY_PROBLEM_SCREEN,
-}
+const RS_SCAN_SHIP_ID = 0
+const RS_SCAN_ITEM_ID = 1
+const RS_SCAN_TOTE_ID = 2
+const RS_SCAN_PROBLEM_CODE = 3
+const RS_DISPLAY_PROBLEM_SCREEN = 4
 
-interface ReceiveProductInfo {
-    code: string
-    current_count: number
-    damaged: boolean
-    total_count: number
-}
+const PSR_DAMAGED = 0
+const PSR_DAMAGED_CODE = 1
+const PSR_OVERFLOW = 2
+const PSR_OTHER = 3
 
-enum ReceivePSReason {
-    DAMAGED,
-    DAMAGED_CODE,
-    OVERFLOW
-}
 
-interface ReceiveFormData {
-    shipID: string
-    itemID: string
-    psrReason?: ReceivePSReason
-
-    products: ReceiveProductInfo[]
-}
-
-interface ReceiveProps extends AuthenticatedUserProps {
-    setStage: React.Dispatch<React.SetStateAction<ReceiveStage>>
-    setFormData: React.Dispatch<React.SetStateAction<ReceiveFormData>>
-    setMessage: React.Dispatch<React.SetStateAction<InlineMessageSettings>>
-    formData: ReceiveFormData
-}
-
-function ReceiveScanID({ user, setStage, setFormData, setMessage }: ReceiveProps) {
-    async function onSubmitForm(e: FormSubmitEvent) {
+function ReceiveScanID({ user, setStage, setFormData, setMessage }) {
+    async function onSubmitForm(e) {
         try {
             const shipId = e.getString('ship_id')
             const response = await api.post('get_receive_products/', { 'ship_id': shipId })
@@ -60,11 +34,10 @@ function ReceiveScanID({ user, setStage, setFormData, setMessage }: ReceiveProps
 
             setMessage({ message: message, type: 'success' })
 
-            setStage(ReceiveStage.SCAN_ITEM_ID)
+            setStage(RS_SCAN_ITEM_ID)
         }
         catch (e) {
-            const ex = e as AxiosError
-            setMessage({ message: `${ex.response?.data.message}`, type: 'danger' })
+            setMessage({ message: `${e.response?.data.message}`, type: 'danger' })
         }
     }
 
@@ -78,8 +51,8 @@ function ReceiveScanID({ user, setStage, setFormData, setMessage }: ReceiveProps
     </div>
 }
 
-function ReceiveItemID({ user, setStage, formData, setFormData, setMessage }: ReceiveProps) {
-    function onSubmit(e: FormSubmitEvent) {
+function ReceiveItemID({ user, setStage, formData, setFormData, setMessage }) {
+    function onSubmit(e) {
         const itemId = e.getString('item_id')
 
         const index = formData.products?.findIndex(v => v.code == itemId)
@@ -93,7 +66,7 @@ function ReceiveItemID({ user, setStage, formData, setFormData, setMessage }: Re
             else {
                 setMessage({ 'type': 'success', 'message': `Selected item ${itemId}` })
                 setFormData({ itemID: itemId, shipID: formData.shipID, products: formData.products })
-                setStage(ReceiveStage.SCAN_TOTE_ID)
+                setStage(RS_SCAN_TOTE_ID)
             }
         }
     }
@@ -108,9 +81,9 @@ function ReceiveItemID({ user, setStage, formData, setFormData, setMessage }: Re
 }
 
 
-function ReceiveScanToteID({ user, setStage, formData, setFormData, setMessage }: ReceiveProps) {
+function ReceiveScanToteID({ user, setStage, formData, setFormData, setMessage }) {
 
-    async function onSubmit(e: FormSubmitEvent) {
+    async function onSubmit(e) {
         const toteId = e.getString('tote_id')
 
         if (!toteId.startsWith('ts')) {
@@ -149,7 +122,7 @@ function ReceiveScanToteID({ user, setStage, formData, setFormData, setMessage }
 
             setFormData({ shipID: formData.shipID, products: formData.products, itemID: '' })
             setMessage({ message: `Inserted product \'${formData.itemID}\' to '${toteId}'`, type: 'success' })
-            setStage(ReceiveStage.SCAN_ITEM_ID)
+            setStage(RS_SCAN_ITEM_ID)
         }
     }
 
@@ -162,25 +135,26 @@ function ReceiveScanToteID({ user, setStage, formData, setFormData, setMessage }
     </div>
 }
 
-export function ReceiveProblemMenu({ setStage, setFormData, formData, setMessage }: ReceiveProps) {
-    async function onSubmit(reason: ReceivePSReason) {
+export function ReceiveProblemMenu({ setStage, setFormData, formData, setMessage }) {
+    async function onSubmit(reason) {
         setFormData({ psrReason: reason, ...formData })
-        setStage(ReceiveStage.SCAN_PROBLEM_CODE)
+        setStage(RS_SCAN_PROBLEM_CODE)
     }
 
     const buttonClass = 'btn btn-lg btn-dark w-100 rounded-0'
 
     return <div className='vw-100 position-absolute top-50 start-50 translate-middle max-w-md d-flex justify-content-center align-items-center flex-column'>
         <h1>Select problem reason</h1>
-        <button className={buttonClass} onClick={e => onSubmit(ReceivePSReason.DAMAGED)}>Product damaged</button>
-        <button className={buttonClass} onClick={e => onSubmit(ReceivePSReason.DAMAGED_CODE)}>Damaged code</button>
-        <button className='btn btn-lg btn-dark w-100 rounded-0' onClick={e => { setStage(ReceiveStage.SCAN_ITEM_ID); setMessage({ type: '' }) }}>Cancel</button>
+        <button className={buttonClass} onClick={e => onSubmit(PSR_DAMAGED)}>Product damaged</button>
+        <button className={buttonClass} onClick={e => onSubmit(PSR_DAMAGED_CODE)}>Damaged code</button>
+        <button className={buttonClass} onClick={e => onSubmit(PSR_DAMAGED_CODE)}>Other</button>
+        <button className='btn btn-lg btn-dark w-100 rounded-0' onClick={e => { setStage(RS_SCAN_ITEM_ID); setMessage({ type: '' }) }}>Cancel</button>
     </div>
 }
 
 
-export function ReceiveScanProblemId({ setStage, setFormData, formData, setMessage }: ReceiveProps) {
-    async function onSubmit(e: FormSubmitEvent) {
+export function ReceiveScanProblemId({ setStage, setFormData, formData, setMessage }) {
+    async function onSubmit(e) {
         try {
             const response = await api.put('receive/ps-raise', {
                 reason: formData.psrReason,
@@ -194,7 +168,7 @@ export function ReceiveScanProblemId({ setStage, setFormData, formData, setMessa
 
         setFormData({ ...formData, itemID: '' })
         setMessage({ message: `Send product ${e.getString('psr_id')} to Problem Solve`, type: 'success' })
-        setStage(ReceiveStage.SCAN_ITEM_ID)
+        setStage(RS_SCAN_ITEM_ID)
     }
 
     return <Form positionedAtCentered={true} submitCallback={e => onSubmit(e)}>
@@ -204,29 +178,29 @@ export function ReceiveScanProblemId({ setStage, setFormData, formData, setMessa
     </Form>
 }
 
-export function Receive({ user }: AuthenticatedUserProps) {
+export function Receive({ user }) {
 
     let [stage, setStage] = useState(0)
-    let [formData, setFormData] = useState<ReceiveFormData>({ itemID: '', products: [], shipID: '' })
+    let [formData, setFormData] = useState({ itemID: '', products: [], shipID: '' })
 
-    let [message, setMessage] = useState<InlineMessageSettings>({ type: 'danger' })
+    let [message, setMessage] = useState({ type: 'danger' })
 
-    const StagesWithProblemSolveButton = [ReceiveStage.SCAN_ITEM_ID, ReceiveStage.SCAN_TOTE_ID]
+    const StagesWithProblemSolveButton = [RS_SCAN_ITEM_ID, RS_SCAN_TOTE_ID]
 
     return <div>
         <ApplicationHeader user={user} header='Receive' operationStatus='primary' displayOptionsMenu={true}>
             {
                 (StagesWithProblemSolveButton.some(v => v == stage)) ?
-                    <button className='dropdown-item fs-6' onClick={e => setStage(ReceiveStage.DISPLAY_PROBLEM_SCREEN)}>Report problem</button> :
+                    <button className='dropdown-item fs-6' onClick={e => setStage(RS_DISPLAY_PROBLEM_SCREEN)}>Report problem</button> :
                     <></>
             }
         </ApplicationHeader>
         {message.message && <InlineMessage message={message.message} type={message.type} />}
-        {(stage == ReceiveStage.SCAN_SHIP_ID) && <ReceiveScanID setMessage={setMessage} formData={formData} setFormData={setFormData} user={user} setStage={setStage} />}
-        {(stage == ReceiveStage.SCAN_ITEM_ID) && <ReceiveItemID setMessage={setMessage} formData={formData} setFormData={setFormData} user={user} setStage={setStage} />}
-        {(stage == ReceiveStage.SCAN_TOTE_ID) && <ReceiveScanToteID setMessage={setMessage} formData={formData} setFormData={setFormData} user={user} setStage={setStage} />}
-        {(stage == ReceiveStage.DISPLAY_PROBLEM_SCREEN) && <ReceiveProblemMenu setMessage={setMessage} formData={formData} setFormData={setFormData} user={user} setStage={setStage} />}
-        {(stage == ReceiveStage.SCAN_PROBLEM_CODE) && <ReceiveScanProblemId setMessage={setMessage} formData={formData} setFormData={setFormData} user={user} setStage={setStage} />}
+        {(stage == RS_SCAN_SHIP_ID) && <ReceiveScanID setMessage={setMessage} formData={formData} setFormData={setFormData} user={user} setStage={setStage} />}
+        {(stage == RS_SCAN_ITEM_ID) && <ReceiveItemID setMessage={setMessage} formData={formData} setFormData={setFormData} user={user} setStage={setStage} />}
+        {(stage == RS_SCAN_TOTE_ID) && <ReceiveScanToteID setMessage={setMessage} formData={formData} setFormData={setFormData} user={user} setStage={setStage} />}
+        {(stage == RS_DISPLAY_PROBLEM_SCREEN) && <ReceiveProblemMenu setMessage={setMessage} formData={formData} setFormData={setFormData} user={user} setStage={setStage} />}
+        {(stage == RS_SCAN_PROBLEM_CODE) && <ReceiveScanProblemId setMessage={setMessage} formData={formData} setFormData={setFormData} user={user} setStage={setStage} />}
 
     </div>
 }

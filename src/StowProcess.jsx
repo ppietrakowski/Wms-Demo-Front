@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState } from "react"
-import { ApplicationHeader } from "./ApplicationHeader.tsx"
-import { InlineMessage, InlineMessageSettings } from "./InlineMessage.tsx"
-import { AuthenticatedUserProps } from "./Login.tsx"
-import { Form, FormSubmitEvent } from "./Form.tsx"
-import InputText from "./InputText.tsx"
-import { api } from "./Api.tsx"
+import { ApplicationHeader } from "./ApplicationHeader.jsx"
+import { InlineMessage } from "./InlineMessage.jsx"
+import { Form } from "./Form.jsx"
+import InputText from "./InputText.jsx"
+import { api } from "./api.jsx"
 
 export function StowScanDropzone({ setMessage, setFormData, formData, setStage }) {
-    async function onSubmit(params: FormSubmitEvent) {
+    async function onSubmit(params) {
         setFormData({ ...formData, dropzone: params.getString('dropzone') })
         setStage(1)
         setMessage({ message: `Scanned drozpone`, type: 'success' })
@@ -21,11 +20,6 @@ export function StowScanDropzone({ setMessage, setFormData, formData, setStage }
 }
 
 function StowScanContainers({ setMessage, setFormData, formData, setStage }) {
-    async function onSubmit() {
-        setStage(1)
-        setMessage({ message: `Scanned drozpone`, type: 'success' })
-    }
-
     const [containers, setContainers] = useState([]);
     const [inputValue, setInputValue] = useState('');
 
@@ -153,7 +147,7 @@ function StowScanNextContainer({ setMessage, setFormData, formData, setStage }) 
 
 function StowScanProduct({ setMessage, setFormData, formData, setStage }) {
 
-    async function onSubmit(params: FormSubmitEvent) {
+    async function onSubmit(params) {
         const code = params.getString('code')
 
         if (code.startsWith('ts') || code.startsWith('cs')) {
@@ -190,7 +184,7 @@ function StowScanProduct({ setMessage, setFormData, formData, setStage }) {
 
 function StowScanLocation({ setMessage, setFormData, formData, setStage }) {
 
-    async function onSubmit(params: FormSubmitEvent) {
+    async function onSubmit(params) {
         const code = params.getString('location')
 
         if (code.startsWith('ts') || code.startsWith('cs')) {
@@ -218,8 +212,8 @@ function StowScanLocation({ setMessage, setFormData, formData, setStage }) {
     </div>
 }
 
-export function Stow({ user }: AuthenticatedUserProps) {
-    let [message, setMessage] = useState<InlineMessageSettings>({ type: '' })
+export function Stow({ user }) {
+    let [message, setMessage] = useState({ type: '' })
     let [stage, setStage] = useState(0)
     let [formData, setFormData] = useState({})
     const [loading, setLoading] = useState(true)
