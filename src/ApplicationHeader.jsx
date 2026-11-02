@@ -9,8 +9,8 @@ export function DropDown({ children, icon, label, dropdownOnRightSide = false })
         iconDiv = <i className={icon}></i>
     }
 
-    return <div className="" >
-        <ReactRouter.Link className="nav-link" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" to="" aria-expanded="false">
+    return <div className="">
+        <ReactRouter.Link style={{ width: 'fit-content' }} className="nav-link" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" to="" aria-expanded="false">
             {iconDiv}
         </ReactRouter.Link>
         <ul className={className}
@@ -43,7 +43,7 @@ export function ApplicationHeader({ user, operationStatus, header, displayOption
         style['color'] = 'white'
     }
 
-    return <header className={`d-grid align-items-center navbar navbar-light bg-${operationStatus}-subtle px-3`} style={style}>
+    return <div className={`d-grid align-items-center navbar navbar-light bg-${operationStatus}-subtle px-3`} style={style}>
         {
             displayOptionsMenu ?
                 (
@@ -53,12 +53,12 @@ export function ApplicationHeader({ user, operationStatus, header, displayOption
                         {children}
                     </DropDown>
                 ) :
-                (<button className='text-white dropdown-item fs-6' onClick={() => handleLogout()}><span className='fa fa-sign-out'></span></button>)
+                (<button className='text-white dropdown-item fs-6' onClick={() => handleLogout()} style={{ width: 'fit-content' }}><span className='fa fa-sign-out'></span></button>)
         }
 
         <div className='fw-bold text-center'>{header}</div>
         <div className='text-end'>
             {user.username}
         </div>
-    </header >
+    </div >
 }
