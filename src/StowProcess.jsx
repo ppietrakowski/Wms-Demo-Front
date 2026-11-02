@@ -6,10 +6,16 @@ import InputText from "./InputText.jsx"
 import { api } from "./api.jsx"
 import ScanContainers from "./ScanContainers.jsx"
 
+const STOW_SCAN_DROPZONE = 0
+const STOW_SCAN_CONTAINERS = 1
+const STOW_SCAN_CONTAINER = 2
+const STOW_SCAN_ITEM = 3
+const STOW_SCAN_LOCATION = 4
+
 export function StowScanDropzone({ setMessage, setFormData, formData, setStage }) {
     async function onSubmit(params) {
         setFormData({ ...formData, dropzone: params.getString('dropzone') })
-        setStage(1)
+        setStage(STOW_SCAN_CONTAINERS)
         setMessage({ message: `Scanned drozpone`, type: 'success' })
     }
 
@@ -27,7 +33,7 @@ function StowScanContainers({ setMessage, setFormData, formData, setStage }) {
         })
             .then(response => {
                 setFormData({ ...formData, containers })
-                setStage(2)
+                setStage(STOW_SCAN_CONTAINER)
             })
     }
 
@@ -45,7 +51,7 @@ function StowScanNextContainer({ setMessage, setFormData, formData, setStage }) 
 
         setMessage({ message: `Selected container ${code}`, type: 'success' })
         setFormData({ ...formData, activeContainer: code })
-        setStage(3)
+        setStage(STOW_SCAN_ITEM)
     }
 
     return <Form positionedAtCentered={true} submitCallback={e => onSubmit(e)}>
@@ -79,7 +85,7 @@ function StowScanProduct({ setMessage, setFormData, formData, setStage }) {
         })
             .then(response => {
                 setFormData({ ...formData, productDetails: response.data['product'] })
-                setStage(4)
+                setStage(STOW_SCAN_LOCATION)
             })
             .catch(e => {
             })
@@ -110,7 +116,7 @@ function StowScanLocation({ setMessage, setFormData, formData, setStage }) {
     return <div>
         <div className="d-flex flex-column justify-content-center align-items-center w-100 ">
             <div className="p-2">
-                Zeskanuj product xDDD
+                Scan Product
             </div>
             <div className="w-100 bg-dark mt-2" style={{ padding: '1px' }}></div>
         </div>
