@@ -1,7 +1,7 @@
 import { CSSProperties, ReactNode, use, useEffect, useState } from 'react';
 import * as ReactRouter from 'react-router-dom'
 import { ApplicationHeader } from './ApplicationHeader.jsx';
-
+import { InlineMessage } from './InlineMessage.jsx';
 
 function ApplicationCategory({ name, children }) {
     const BsTargetId = `collapse${name}`
