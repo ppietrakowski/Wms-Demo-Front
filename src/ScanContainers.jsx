@@ -1,9 +1,7 @@
 import { useState } from "react";
-export default function ScanContainers({ setMessage, onFinishedScanning }) {
-
+export default function ScanContainers({ setMessage, onFinishedScanning, validateContainer }) {
     const [containers, setContainers] = useState([]);
     const [inputValue, setInputValue] = useState('');
-    // Automatyczne ustawienie fokusu na polu przy starcie
 
     const handleAddContainer = (e) => {
         e.preventDefault();
@@ -15,9 +13,15 @@ export default function ScanContainers({ setMessage, onFinishedScanning }) {
                 return;
             }
 
+            if (validateContainer && !validateContainer(code)) {
+                setMessage({ message: 'Scan valid type of container', type: 'danger' })
+                return;
+            }
+
             if (!containers.includes(code)) {
                 setContainers((prev) => [code, ...prev]);
             }
+
             setInputValue('');
         }
     };
@@ -54,7 +58,6 @@ export default function ScanContainers({ setMessage, onFinishedScanning }) {
                 </form>
             </div>
 
-            {/* PRZEWIJANA LISTA Z KONTROLĄ WYSOKOŚCI */}
             <div
                 className="card-body overflow-y-auto mh-100 h-25 p-3">
                 {containers.length === 0 ? (
@@ -78,7 +81,6 @@ export default function ScanContainers({ setMessage, onFinishedScanning }) {
                 )}
             </div>
 
-            {/* STOPKA */}
             <button className="btn btn-primary text-center text-end small py-2 rounded-0 " onClick={e => onFinishedScanning(containers)}>
                 Scanned all containers
             </button>
