@@ -1,7 +1,7 @@
 
 import { Axios, AxiosError } from "axios";
 
-export function getErrorMessage(error: AxiosError) {
+export function getErrorMessage(error) {
     if (!error.response) {
         // Network failure, backend down, or CORS issue
         return 'Unable to connect to the server. Please check your internet connection.';
@@ -60,8 +60,4 @@ export function getErrorMessage(error: AxiosError) {
         default:
             return `An unexpected error occurred (Code: ${status}).`;
     }
-}
-
-export default function consumeError(err: any) {
-    err as void
 }
