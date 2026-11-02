@@ -57,7 +57,9 @@ function ReceiveItemID({ user, setStage, formData, setFormData, setMessage }) {
 
         const index = formData.products?.findIndex(v => v.code == itemId)
         if (index == -1) {
-            setMessage({ message: 'No such item', type: 'danger' })
+            setFormData({ psrReason: PSR_OVERFLOW, ...formData })
+            setStage(RS_SCAN_PROBLEM_CODE)
+            setMessage({ message: 'Overflow detected', type: 'danger' })
         }
         else {
             if (formData.products[index].current_count <= 0) {
@@ -147,7 +149,7 @@ export function ReceiveProblemMenu({ setStage, setFormData, formData, setMessage
         <h1>Select problem reason</h1>
         <button className={buttonClass} onClick={e => onSubmit(PSR_DAMAGED)}>Product damaged</button>
         <button className={buttonClass} onClick={e => onSubmit(PSR_DAMAGED_CODE)}>Damaged code</button>
-        <button className={buttonClass} onClick={e => onSubmit(PSR_DAMAGED_CODE)}>Other</button>
+        <button className={buttonClass} onClick={e => onSubmit(PSR_OTHER)}>Other</button>
         <button className='btn btn-lg btn-dark w-100 rounded-0' onClick={e => { setStage(RS_SCAN_ITEM_ID); setMessage({ type: '' }) }}>Cancel</button>
     </div>
 }

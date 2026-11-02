@@ -136,7 +136,7 @@ export function MoveToDropzone({ user }) {
         <ApplicationHeader header="Move to dropzone" user={user} displayOptionsMenu={true} operationStatus="primary">
         </ApplicationHeader>
         {message.message && <InlineMessage message={message.message} type={message.type} />}
-        {(stage == 0) && <ScanContainers setMessage={setMessage} setFormData={formData} setStage={setStage} />}
-        {(stage == 1) && <ScanDropzone setMessage={setMessage} formData={formData} setStage={setStage} />}
+        {(stage == 0) && <ScanContainers setMessage={setMessage} setFormData={setFormData} formData={formData} setStage={setStage} />}
+        {(stage == 1) && <ScanDropzone setMessage={setMessage} setFormData={setFormData} formData={formData} setStage={setStage} />}
     </div>
 }
