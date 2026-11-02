@@ -116,15 +116,23 @@ function StowScanLocation({ setMessage, setFormData, formData, setStage }) {
     return <div>
         <div className="d-flex flex-column justify-content-center align-items-center w-100 ">
             <div className="p-2">
-                Scan Product
+                <Form positionedAtCentered={false} submitCallback={e => onSubmit(e)}>
+                    <InputText className="hidden" type="text" submitElementKey="location" maxLength={12}>
+                        Scan Location (Or container)
+                    </InputText>
+                </Form>
             </div>
             <div className="w-100 bg-dark mt-2" style={{ padding: '1px' }}></div>
+            <div className="d-flex justify-content-between align-items-center w-100">
+                <div className="p-2 text-muted ms-3">THERE WILL BE IMAGE</div>
+                <div className="d-flex flex-column me-3">
+                    <div className="p-2 border border-2 border-dark fs-3">{formData.productDetails.id}</div>
+                    <div className="p-2 fs-6 text-primary">{formData.productDetails.weight / 1000.0} kg</div>
+                    <div className="p-2 fs-6 fw-bold">{formData.productDetails.name}</div>
+                </div>
+            </div>
         </div>
-        <Form positionedAtCentered={false} submitCallback={e => onSubmit(e)}>
-            <InputText className="hidden" type="text" submitElementKey="location" maxLength={12}>
-                Scan Location (Or container)
-            </InputText>
-        </Form>
+
     </div>
 }
 
