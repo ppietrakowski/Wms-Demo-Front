@@ -52,10 +52,12 @@ function ReceiveScanID({ user, setStage, setFormData, setMessage }) {
 }
 
 function ReceiveItemID({ user, setStage, formData, setFormData, setMessage }) {
-    function onSubmit(e) {
+    async function onSubmit(e) {
         const itemId = e.getString('item_id')
-
-        const index = formData.products?.findIndex(v => v.code == itemId)
+        const p = await api.get(`get-product/${itemId}/`)
+        console.log(p.data)
+        console.log(formData.products)
+        const index = formData.products.findIndex(v => v.code == p.data.product['id'])
         if (index == -1) {
             setFormData({ psrReason: PSR_OVERFLOW, ...formData })
             setStage(RS_SCAN_PROBLEM_CODE)
@@ -66,8 +68,8 @@ function ReceiveItemID({ user, setStage, formData, setFormData, setMessage }) {
                 setMessage({ message: 'No such item', type: 'danger' })
             }
             else {
-                setMessage({ 'type': 'success', 'message': `Selected item ${itemId}` })
-                setFormData({ itemID: itemId, shipID: formData.shipID, products: formData.products })
+                setMessage({ 'type': 'success', 'message': `Selected item ${itemId}(${formData.products[index].code})` })
+                setFormData({ itemID: p.data.product['id'], shipID: formData.shipID, products: formData.products })
                 setStage(RS_SCAN_TOTE_ID)
             }
         }
@@ -75,7 +77,7 @@ function ReceiveItemID({ user, setStage, formData, setFormData, setMessage }) {
 
     return <div>
         <Form positionedAtCentered={true} submitCallback={e => onSubmit(e)}>
-            <InputText type='text' submitElementKey='item_id' maxLength={12}>
+            <InputText type='text' submitElementKey='item_id' maxLength={13}>
                 Scan Item ID
             </InputText>
         </Form>
@@ -109,23 +111,28 @@ function ReceiveScanToteID({ user, setStage, formData, setFormData, setMessage }
             return;
         }
 
-        const response = await api.post(`container/move-product/`, {
+        api.post(`container/move-product/`, {
             'count': 1,
             'product': formData.itemID,
             'destination_container': toteId,
             'source_container': formData.shipID
         })
+            .then(response => {
+                if (response.status == 200 || response.status == 201) {
+                    formData.products[index].current_count -= 1
+                    if (formData.products[index].current_count <= 0) {
+                        formData.products.splice(index, 1)
+                    }
 
-        if (response.status == 200 || response.status == 201) {
-            formData.products[index].current_count -= 1
-            if (formData.products[index].current_count <= 0) {
-                formData.products.splice(index, 1)
-            }
+                    setFormData({ shipID: formData.shipID, products: formData.products, itemID: '' })
+                    setMessage({ message: `Inserted product \'${formData.itemID}\' to '${toteId}'`, type: 'success' })
+                    setStage(RS_SCAN_ITEM_ID)
+                }
+            })
+            .catch(e => {
+                console.log(e.response.data)
+            })
 
-            setFormData({ shipID: formData.shipID, products: formData.products, itemID: '' })
-            setMessage({ message: `Inserted product \'${formData.itemID}\' to '${toteId}'`, type: 'success' })
-            setStage(RS_SCAN_ITEM_ID)
-        }
     }
 
     return <div>

@@ -92,7 +92,7 @@ function StowScanProduct({ setMessage, setFormData, formData, setStage }) {
     }
 
     return <Form positionedAtCentered={true} submitCallback={e => onSubmit(e)}>
-        <InputText className="hidden" type="text" submitElementKey="code" maxLength={12}>
+        <InputText className="hidden" type="text" submitElementKey="code" maxLength={13}>
             Scan Product Or Container
         </InputText>
     </Form>
