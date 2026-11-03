@@ -109,37 +109,48 @@ function StowScanLocation({ setMessage, setFormData, formData, setStage }) {
             setStage(3)
             return;
         }
-
-
     }
 
-    return <div>
-        <div className="d-flex flex-column justify-content-center align-items-center w-100 ">
-            <div className="p-2">
-                <Form positionedAtCentered={false} submitCallback={e => onSubmit(e)}>
-                    <InputText className="hidden" type="text" submitElementKey="location" maxLength={12}>
-                        Scan Location (Or container)
-                    </InputText>
-                </Form>
-            </div>
-            <div className="w-100 bg-dark mt-2" style={{ padding: '1px' }}></div>
-            <div className="d-flex justify-content-between align-items-center w-100">
-                <div className="p-2 text-muted ms-3">THERE WILL BE IMAGE</div>
-                <div className="d-flex flex-column me-3">
-                    <div className="p-2 border border-2 border-dark fs-3">{formData.productDetails.id}</div>
-                    <div className="p-2 fs-6 text-primary">{formData.productDetails.weight / 1000.0} kg</div>
-                    <div className="p-2 fs-6 fw-bold">{formData.productDetails.name}</div>
+    if (!formData.theme) {
+        return <div>
+            <div className="d-flex flex-column justify-content-center align-items-center w-100 ">
+                <div className="p-2">
+                    <Form positionedAtCentered={false} submitCallback={e => onSubmit(e)}>
+                        <InputText className="hidden" type="text" submitElementKey="location" maxLength={12}>
+                            Scan Location (Or container)
+                        </InputText>
+                    </Form>
+                </div>
+                <div className="w-100 bg-dark mt-2" style={{ padding: '1px' }}></div>
+                <div className="d-flex justify-content-between align-items-center w-100">
+                    <div className="p-2 text-muted ms-3">THERE WILL BE IMAGE</div>
+                    <div className="d-flex flex-column me-3">
+                        <div className="p-2 border border-2 border-dark fs-3">{formData.productDetails.id}</div>
+                        <div className="p-2 fs-6 text-primary">{formData.productDetails.weight / 1000.0} kg</div>
+                        <div className="p-2 fs-6 fw-bold">{formData.productDetails.name}</div>
+                    </div>
                 </div>
             </div>
         </div>
+    } else if (formData.theme == 'CRETAPP') {
+        return <div className="d-flex flex-column justify-content-center align-items-center w-100 ">
+            <div className="d-flex justify-content-between w-100 p-3">
+                <div></div>
+                <div></div>
+                <div>Container</div>
+                <div>{formData.activeContainer}</div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
 
-    </div>
+    }
 }
 
 export function Stow({ user }) {
     let [message, setMessage] = useState({ type: '' })
     let [stage, setStage] = useState(0)
-    let [formData, setFormData] = useState({})
+    let [formData, setFormData] = useState({ theme: 'CRETAPP' })
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -168,13 +179,13 @@ export function Stow({ user }) {
         <ApplicationHeader header="Stow" user={user} displayOptionsMenu={true} operationStatus="primary">
         </ApplicationHeader>
         {message.message && <InlineMessage message={message.message} type={message.type} />}
-        {stage == 0 && <StowScanDropzone setStage={setStage} formData={formData} setFormData={setFormData} setMessage={setMessage} />}
-        {stage == 1 && <StowScanContainers setStage={setStage} formData={formData} setFormData={setFormData} setMessage={setMessage} />}
-        {stage == 2 && <StowScanNextContainer setStage={setStage} formData={formData} setFormData={setFormData} setMessage={setMessage} />}
-        {stage == 3 && <StowScanProduct setStage={setStage} formData={formData} setFormData={setFormData} setMessage={setMessage} />}
-        {stage == 4 && <StowScanLocation setStage={setStage} formData={formData} setFormData={setFormData} setMessage={setMessage} />}
+        {stage == STOW_SCAN_DROPZONE && <StowScanDropzone setStage={setStage} formData={formData} setFormData={setFormData} setMessage={setMessage} />}
+        {stage == STOW_SCAN_CONTAINERS && <StowScanContainers setStage={setStage} formData={formData} setFormData={setFormData} setMessage={setMessage} />}
+        {stage == STOW_SCAN_CONTAINER && <StowScanNextContainer setStage={setStage} formData={formData} setFormData={setFormData} setMessage={setMessage} />}
+        {stage == STOW_SCAN_ITEM && <StowScanProduct setStage={setStage} formData={formData} setFormData={setFormData} setMessage={setMessage} />}
+        {stage == STOW_SCAN_LOCATION && <StowScanLocation setStage={setStage} formData={formData} setFormData={setFormData} setMessage={setMessage} />}
 
-        {formData.activeContainer && <footer className="footer bg-secondary-subtle ps-2 p-1 w-100 position-absolute bottom-0">
+        {formData.activeContainer && !formData.theme && <footer className="footer bg-secondary-subtle ps-2 p-1 w-100 position-absolute bottom-0">
             <span className="text-muted">{formData.activeContainer}</span>
         </footer>}
     </div>
