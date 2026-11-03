@@ -9,6 +9,7 @@ import ScanContainers from "./ScanContainers.jsx";
 function MVDScanContainers({ formData, setStage, setFormData, setMessage }) {
     return <ScanContainers setMessage={setMessage} onFinishedScanning={containers => {
         setFormData({ ...formData, containers })
+        setStage(1)
     }} />
 }
 
