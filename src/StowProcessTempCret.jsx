@@ -203,14 +203,19 @@ function StowScanLocation({ setMessage, setFormData, formData, setStage }) {
         }
 
         if (code.startsWith('bin')) {
-            await api.post('stow-item', {
+
+            api.post('stow-item/', {
                 container: formData.activeContainer,
                 item: formData.productDetails.id,
                 count: 1,
                 target_bin: code
+            }).then(response => {
+                setMessage({ message: `Stowed item ${formData.code} in ${code}`, type: 'success' })
+                setStage(STOW_SCAN_ITEM)
             })
-            setMessage({ message: `Stowed item ${formData.code} in ${code}`, type: 'success' })
-            setStage(STOW_SCAN_ITEM)
+                .catch(e => {
+                    setMessage({ message: e.response.data['reason'], type: 'error' })
+                })
         }
     }
 
