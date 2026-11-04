@@ -152,6 +152,8 @@ function StowScanLocation({ setMessage, setFormData, formData, setStage }) {
                 <div></div>
                 <div></div>
             </div>
+            <div className="w-100 bg-dark mt-2" style={{ padding: '1px' }}></div>
+
         </div>
 
     }
