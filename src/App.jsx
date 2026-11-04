@@ -6,7 +6,6 @@ import { use, useEffect, useState } from 'react';
 import { api } from './api.jsx';
 import { MoveToDropzone } from './MoveToDropZone.jsx';
 import { Stow } from './StowProcess.jsx';
-import { StowProcessCretLike } from './StowProcessTempCret.jsx';
 
 
 
@@ -62,7 +61,6 @@ function Application() {
             <ReactRouter.Route path='/receive' element={<Receive user={user} />} />
             <ReactRouter.Route path='/move-dropzone' element={<MoveToDropzone user={user} />} />
             <ReactRouter.Route path='/stow' element={<Stow user={user} />} />
-            <ReactRouter.Route path='/stow-tmp' element={<StowProcessCretLike user={user} />} />
 
             <ReactRouter.Route path='/login' element={<ReactRouter.Navigate to='/menu' replace />} />
 

@@ -41,7 +41,6 @@ function SelectApplication() {
         <ApplicationCategory name='Inbound'>
             <CategoryElement name='Receive' redirectionAddress='/receive' />
             <CategoryElement name='Stow' redirectionAddress='/stow' />
-            <CategoryElement name='Stow (Cret temp)' redirectionAddress='/stow-tmp' />
             <CategoryElement name='Move to dropzone' redirectionAddress='/move-dropzone' />
         </ApplicationCategory>
         <ApplicationCategory name='Outbound'>

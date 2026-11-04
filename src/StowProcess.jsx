@@ -1,35 +1,110 @@
-import { useEffect, useRef, useState } from "react"
-import { ApplicationHeader } from "./ApplicationHeader.jsx"
-import { InlineMessage } from "./InlineMessage.jsx"
-import { Form } from "./Form.jsx"
-import InputText from "./InputText.jsx"
-import { api } from "./api.jsx"
-import ScanContainers from "./ScanContainers.jsx"
+import { useEffect, useRef, useState } from "react";
+import { ApplicationHeader } from "./ApplicationHeader.jsx";
+import { Form } from "./Form.jsx";
+import { InlineMessage } from "./InlineMessage.jsx";
+import { api } from "./api.jsx";
+import { Link } from "react-router-dom";
+
 
 const STOW_SCAN_DROPZONE = 0
 const STOW_SCAN_CONTAINERS = 1
 const STOW_SCAN_CONTAINER = 2
 const STOW_SCAN_ITEM = 3
 const STOW_SCAN_LOCATION = 4
-const STOW_SCAN_MOVE_TO_DROPZONE_CONTAINERS = 5
-const STOW_SCAN_MOVE_TO_DROPZONE_DROPZONE = 6
+const STOW_MOVE_CONTAINERS = 5
+const STOW_MOVE_CONTAINERS_DROPZONE = 6
+const STOW_MOVE_CONTAINERS_ENDSESSION = 7
 
-export function StowScanDropzone({ setMessage, setFormData, formData, setStage }) {
-    async function onSubmit(params) {
-        setFormData({ ...formData, dropzone: params.getString('dropzone') })
-        setStage(STOW_SCAN_CONTAINERS)
-        setMessage({ message: `Scanned drozpone`, type: 'success' })
-    }
 
-    return <Form positionedAtCentered={true} submitCallback={e => onSubmit(e)}>
-        <InputText className="hidden" type="text" maxLength={12}>
-            Scan Dropzone
-        </InputText>
-    </Form>
+
+function restoreFocus(inputRef) {
+    if (inputRef.current)
+        inputRef.current.focus()
 }
 
-function StowScanContainers({ setMessage, setFormData, formData, setStage }) {
-    function submitContainers(containers) {
+function ScanFormText({ outputName, onSubmit, children, className }) {
+    const inputRef = useRef(null);
+
+    useEffect(() => {
+        restoreFocus(inputRef)
+
+        const handleDocumentClick = () => {
+            restoreFocus(inputRef)
+        }
+
+        document.addEventListener('click', handleDocumentClick)
+
+        return () => {
+            document.removeEventListener('click', handleDocumentClick);
+        }
+    }, []);
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            const code = e.target.value.trim();
+
+            if (code) {
+                onSubmit(code)
+            }
+
+            // Wyczyść pole
+            e.target.value = '';
+        }
+    };
+
+    const classes = ['position-absolute top-50 start-50 translate-middle d-flex flex-column justify-content-between']
+
+    if (className) {
+        classes.push(className)
+    }
+
+    return <div className={classes.join(' ')}>
+        {children}
+        <input ref={inputRef} name={outputName} autoFocus={true} onKeyDown={e => handleKeyDown(e)} style={{
+            position: 'absolute',
+            left: '-9999px',
+            opacity: 0,
+            pointerEvents: 'none',
+        }} autoComplete="false">
+
+        </input>
+    </div>
+}
+
+function StowScanDropzone({ user, setMessage, setStage, setFormData, formData, stage }) {
+    function submit(dropzone) {
+        if (dropzone.startsWith('dz-')) {
+            setFormData({ ...formData, dropzone })
+            setStage(STOW_SCAN_CONTAINERS)
+            setMessage({ message: 'Selected dropzone !', type: 'success' })
+        } else {
+            setMessage({ message: 'Scan valid dropzone !', type: 'danger' })
+        }
+    }
+
+    return <ScanFormText onSubmit={dropzone => submit(dropzone)} outputName={'dropzone'}>
+        Scan dropzone to start stowing
+    </ScanFormText>
+}
+
+function StowScanContainers({ message, setMessage, setStage, setFormData, formData }) {
+    const [containers, setContainers] = useState([])
+
+    function submit(container) {
+        if (container.startsWith('ts') || container.startsWith('cs')) {
+            if (!containers.some(c => c == container)) {
+                setContainers(containers.concat([container]))
+            }
+
+            if (message.type == 'danger') {
+                setMessage({})
+            }
+        } else {
+            setMessage({ message: 'Scanned invalid code !', type: 'danger' })
+        }
+    }
+
+    function onScannedAllContainers() {
         api.post('start-stow-session/', {
             containers: containers
         })
@@ -39,13 +114,19 @@ function StowScanContainers({ setMessage, setFormData, formData, setStage }) {
             })
     }
 
-    return <ScanContainers onFinishedScanning={containers => submitContainers(containers)} setMessage={(setMessage)} />
+    return <ScanFormText onSubmit={dropzone => submit(dropzone)} outputName={'dropzone'} className={'w-100 p-1'}>
+        <span className="d-flex justify-content-center fw-bold">Scan containers</span>
+        {containers.length &&
+            <span className="d-flex justify-content-center">Last scanned container:
+                <span className="fw-bold ps-1">{containers[containers.length - 1]}</span></span>}
+        <button className="btn btn-primary pt-3 pb-3" onClick={e => onScannedAllContainers()}>Scanned all containers</button>
+    </ScanFormText>
 }
 
 function StowScanNextContainer({ setMessage, setFormData, formData, setStage }) {
 
-    function onSubmit(e) {
-        const code = e.getString('container')
+    function onSubmit(container) {
+        const code = container
         if (!formData.containers.includes(code)) {
             setMessage({ message: 'Invalid container or not added to session', type: 'error' })
             return;
@@ -56,25 +137,28 @@ function StowScanNextContainer({ setMessage, setFormData, formData, setStage }) 
         setStage(STOW_SCAN_ITEM)
     }
 
-    useEffect(() => {
-        if (!formData.continue && formData.containers.length == 1) {
-            setMessage({ message: `Selected container ${formData.containers[0]}`, type: 'success' })
-            setFormData({ ...formData, activeContainer: formData.containers[0] })
-            setStage(STOW_SCAN_ITEM)
-        }
-    }, [])
-
-    return <Form positionedAtCentered={true} submitCallback={e => onSubmit(e)}>
-        <InputText className="hidden" type="text" submitElementKey="container" maxLength={12}>
-            Scan Container {formData.continue && <span> to continue stow</span>}
-        </InputText>
-    </Form>
+    return <ScanFormText onSubmit={container => onSubmit(container)} outputName={'container_tmp'}>
+        Scan container
+    </ScanFormText>
 }
+
+function TextAccentLastChars({ text, numChars = 4, className, boldClassName }) {
+    const boldClass = ['fw-bold']
+
+    if (boldClassName) {
+        boldClass.push(boldClassName)
+    }
+
+    return <div className={className}>
+        {text.substring(0, text.length - numChars)}
+        <span className={boldClass.join(' ')}>{text.substring(text.length - numChars)}</span>
+    </div>
+}
+
 
 function StowScanProduct({ setMessage, setFormData, formData, setStage }) {
 
-    async function onSubmit(params) {
-        const code = params.getString('code')
+    async function onSubmit(code) {
 
         if (code.startsWith('ts') || code.startsWith('cs')) {
 
@@ -94,89 +178,168 @@ function StowScanProduct({ setMessage, setFormData, formData, setStage }) {
             container: formData.activeContainer,
         })
             .then(response => {
-                setFormData({ ...formData, productDetails: response.data['product'] })
+                setFormData({ ...formData, productDetails: response.data['product'], code })
                 setStage(STOW_SCAN_LOCATION)
             })
             .catch(e => {
             })
     }
 
-    return <Form positionedAtCentered={true} submitCallback={e => onSubmit(e)}>
-        <InputText className="hidden" type="text" submitElementKey="code" maxLength={13}>
-            Scan Product Or Container
-        </InputText>
-    </Form>
+    const { activeContainer } = formData
+    return <div className='h-100'>
+        <div className="position-absolute bottom-0 p-1 bg-dark text-white w-100">{activeContainer}</div>
+        <ScanFormText outputName={'code'} onSubmit={code => onSubmit(code)}>
+            Scan product or container
+        </ScanFormText>
+    </div>
 }
+
 
 function StowScanLocation({ setMessage, setFormData, formData, setStage }) {
 
-    async function onSubmit(params) {
-        const code = params.getString('location')
-
+    async function onSubmit(code) {
         if (code.startsWith('ts') || code.startsWith('cs')) {
             setMessage({ message: `Selected container ${code}`, type: 'success' })
             setFormData({ ...formData, activeContainer: code })
             setStage(3)
             return;
         }
+        else if (code.startsWith('bin')) {
+
+            api.post('stow-item/', {
+                container: formData.activeContainer,
+                item: formData.productDetails.id,
+                count: 1,
+                target_bin: code
+            }).then(response => {
+                setMessage({ message: `Stowed item ${formData.code} in ${code}`, type: 'success' })
+                setStage(STOW_SCAN_ITEM)
+            })
+                .catch(e => {
+                    setMessage({ message: e.response.data['reason'], type: 'error' })
+                })
+        }
+        else {
+            setMessage({ message: 'Invalid code. Please scan location or container', type: 'error' })
+        }
     }
 
-    if (!formData.theme) {
-        return <div>
-            <div className="d-flex flex-column justify-content-center align-items-center w-100 ">
-                <div className="p-2">
-                    <Form positionedAtCentered={false} submitCallback={e => onSubmit(e)}>
-                        <InputText className="hidden" type="text" submitElementKey="location" maxLength={12}>
-                            Scan Location (Or container)
-                        </InputText>
-                    </Form>
+    const { activeContainer, productDetails } = formData
+    useEffect(() => {
+        if (productDetails.damaged) {
+            setMessage({ message: 'Unsellable', type: 'warning' })
+        } else {
+            setMessage({})
+        }
+    }, [])
+
+
+    return <div className='h-100'>
+        <div className="d-flex justify-content-between">
+            <div className="d-flex flex-column m-1">
+                <TextAccentLastChars className={'badge bg-primary'} text={formData.code} boldClassName={'fs-6'} />
+                <div>Weight: <span className="fw-bold">{productDetails.weight / 1000.0}</span> kg</div>
+            </div>
+            <div className="m-1">{productDetails.name}</div>
+        </div>
+        <div className="position-absolute bottom-0 p-1 bg-dark text-white w-100">{activeContainer}</div>
+        <ScanFormText outputName={'code'} onSubmit={code => onSubmit(code)}>
+            Scan location
+        </ScanFormText>
+    </div>
+}
+
+
+function ErrorScan({ setMessage, formData }) {
+    useEffect(() => {
+        setMessage({ message: 'Functionality not implemented', type: 'warning' })
+    }, [])
+    return <div className="position-absolute translate-middle start-50 top-50">
+        Functionality not implemented
+    </div>
+}
+
+
+function ShowModal({ title, children, buttons, id }) {
+    return <div class="modal fade" id={id} data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog  modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">{title}</h5>
                 </div>
-                <div className="w-100 bg-dark mt-2" style={{ padding: '1px' }}></div>
-                <div className="d-flex justify-content-between align-items-center w-100">
-                    <div className="p-2 text-muted ms-3">THERE WILL BE IMAGE</div>
-                    <div className="d-flex flex-column me-3">
-                        <div className="p-2 border border-2 border-dark fs-3">{formData.productDetails.id}</div>
-                        <div className="p-2 fs-6 text-primary">{formData.productDetails.weight / 1000.0} kg</div>
-                        <div className="p-2 fs-6 fw-bold">{formData.productDetails.name}</div>
-                    </div>
+                <div class="modal-body">
+                    {children}
+
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    {buttons}
                 </div>
             </div>
         </div>
-    } else if (formData.theme == 'CRETAPP') {
-        return <div className="d-flex flex-column justify-content-center align-items-center w-100 ">
-            <div className="d-flex justify-content-between w-100 p-3">
-                <div></div>
-                <div></div>
-                <div>Container</div>
-                <div>{formData.activeContainer}</div>
-                <div></div>
-                <div></div>
-            </div>
-            <div className="w-100 bg-dark mt-2" style={{ padding: '1px' }}></div>
-        </div>
-
-    }
+    </div>
 }
 
-function StowMoveContainers({ setMessage, setFormData, formData, setStage }) {
-    return <ScanContainers setMessage={setMessage} onFinishedScanning={containers => {
-        setFormData({ ...formData, move_containers: containers })
-        setStage(STOW_SCAN_MOVE_TO_DROPZONE_DROPZONE)
-    }
-    } />
-}
+function StowMoveContainers({ setMessage, setFormData, formData, setStage, message, stage }) {
+    const [containers, setContainers] = useState([])
 
-function StowMoveContainersDropzone({ setMessage, setFormData, formData, setStage }) {
-    async function onSubmit(params) {
-        const data = await api.post('stow-move-containers/', {
-            'containers': formData.move_containers,
-            'dropzone': params.getString('dropzone')
+    function submit(container) {
+        if (container.startsWith('ts') || container.startsWith('cs')) {
+            if (!containers.some(c => c == container)) {
+                setContainers(containers.concat([container]))
+            }
+
+            if (message.type == 'danger') {
+                setMessage({})
+            }
+        } else {
+            setMessage({ message: 'Scanned invalid code !', type: 'danger' })
+        }
+    }
+
+    function onScannedAllContainers() {
+        api.post('start-stow-session/', {
+            containers: containers
         })
-        const containers = formData.containers.filter(e => !formData.move_containers.some(v => e == v))
+            .then(response => {
+                formData.finishStowing = stage == STOW_MOVE_CONTAINERS_ENDSESSION
+                setFormData({ ...formData, dropContainers: containers })
+                setStage(STOW_MOVE_CONTAINERS_DROPZONE)
+            })
+    }
+
+    return <ScanFormText onSubmit={dropzone => submit(dropzone)} outputName={'dropzone'} className={'w-100 p-1'}>
+        <span className="d-flex justify-content-center fw-bold">Scan containers</span>
+        <span className="d-flex justify-content-center">Scanned {containers.length} containers</span>
+        <button className="btn btn-primary pt-3 pb-3" onClick={e => onScannedAllContainers()}>Scanned all containers</button>
+        <button className="btn btn-secondary pt-3 pb-3" onClick={e => setStage(STOW_SCAN_CONTAINER)}>Cancel</button>
+    </ScanFormText>
+}
+
+function sendEndStowSessionRequest(setStage, setFormData, setMessage) {
+    api.post('end-stow-session/')
+        .then(response => {
+            setFormData({})
+            setMessage({ message: 'Finished stowing !', type: 'success' })
+            setStage(STOW_SCAN_DROPZONE)
+        })
+}
+
+function StowMoveContainersScanDropzone({ user, setMessage, setStage, setFormData, formData, stage }) {
+    async function submit(dropzone) {
+        const data = await api.post('stow-move-containers/', {
+            'containers': formData.dropContainers,
+            'dropzone': dropzone
+        })
+        const containers = formData.containers.filter(e => !formData.dropContainers.some(v => e == v))
 
         setFormData({ ...formData, containers })
 
         setMessage({ message: `Dropped containers`, type: 'success' })
+
+        if (formData.finishStowing) {
+            sendEndStowSessionRequest(setStage, setFormData, setMessage)
+            return;
+        }
 
         if (containers.length == 0) {
             setFormData({})
@@ -186,17 +349,27 @@ function StowMoveContainersDropzone({ setMessage, setFormData, formData, setStag
         }
     }
 
-    return <Form positionedAtCentered={true} submitCallback={e => onSubmit(e)}>
-        <InputText className="hidden" type="text" maxLength={12} submitElementKey={'dropzone'}>
-            Scan Dropzone
-        </InputText>
-    </Form>
+
+    return <ScanFormText onSubmit={dropzone => submit(dropzone)} outputName={'dropzone'}>
+        Scan dropzone
+    </ScanFormText>
 }
 
+const StagesComponents = [
+    StowScanDropzone,
+    StowScanContainers,
+    StowScanNextContainer,
+    StowScanProduct,
+    StowScanLocation,
+    StowMoveContainers,
+    StowMoveContainersScanDropzone,
+    StowMoveContainers,
+]
+
 export function Stow({ user }) {
-    let [message, setMessage] = useState({ type: '' })
-    let [stage, setStage] = useState(0)
-    let [formData, setFormData] = useState({ theme: 'CRETAPP' })
+    let [message, setMessage] = useState({ type: 'primary' })
+    let [stage, setStage] = useState(STOW_SCAN_DROPZONE)
+    let [formData, setFormData] = useState({})
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -221,26 +394,34 @@ export function Stow({ user }) {
         </div>
     }
 
-    return <div className="d-flex flex-column h-100">
-        <ApplicationHeader header="Stow" user={user} displayOptionsMenu={true} operationStatus="primary">
+    const Component = StagesComponents[stage] || ErrorScan
+
+
+
+    return <div className="">
+        <ApplicationHeader operationStatus={message.type} user={user} header={'Stow'} displayOptionsMenu={true}>
             {
-                (stage > STOW_SCAN_CONTAINER) ? (
-                    <button className="text-white dropdown-item fs-6" onClick={e => setStage(STOW_SCAN_MOVE_TO_DROPZONE_CONTAINERS)}>Move containers</button>
-                ) : (<div></div>)
+                stage <= STOW_SCAN_CONTAINER ?
+                    (<div></div>) :
+                    (
+                        <div>
+                            <button className="dropdown-item" data-bs-toggle="modal" data-bs-target="#end-stow-session">End stow session</button>
+                            <button className="dropdown-item" onClick={e => setStage(STOW_MOVE_CONTAINERS)}>Move containers</button>
+                        </div>
+                    )
             }
 
         </ApplicationHeader>
         {message.message && <InlineMessage message={message.message} type={message.type} />}
-        {stage == STOW_SCAN_DROPZONE && <StowScanDropzone setStage={setStage} formData={formData} setFormData={setFormData} setMessage={setMessage} />}
-        {stage == STOW_SCAN_CONTAINERS && <StowScanContainers setStage={setStage} formData={formData} setFormData={setFormData} setMessage={setMessage} />}
-        {stage == STOW_SCAN_CONTAINER && <StowScanNextContainer setStage={setStage} formData={formData} setFormData={setFormData} setMessage={setMessage} />}
-        {stage == STOW_SCAN_ITEM && <StowScanProduct setStage={setStage} formData={formData} setFormData={setFormData} setMessage={setMessage} />}
-        {stage == STOW_SCAN_LOCATION && <StowScanLocation setStage={setStage} formData={formData} setFormData={setFormData} setMessage={setMessage} />}
-        {stage == STOW_SCAN_MOVE_TO_DROPZONE_CONTAINERS && <StowMoveContainers setStage={setStage} formData={formData} setFormData={setFormData} setMessage={setMessage} />}
-        {stage == STOW_SCAN_MOVE_TO_DROPZONE_DROPZONE && <StowMoveContainersDropzone setStage={setStage} formData={formData} setFormData={setFormData} setMessage={setMessage} />}
-
-        {formData.activeContainer && !formData.theme && <footer className="footer bg-secondary-subtle ps-2 p-1 w-100 position-absolute bottom-0">
-            <span className="text-muted">{formData.activeContainer}</span>
-        </footer>}
+        <Component user={user} message={message} formData={formData} setFormData={setFormData} setStage={setStage} stage={stage} setMessage={setMessage} />
+        <ShowModal id={'end-stow-session'} title={'End stow session'} buttons={
+            [<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>,
+            <div className="d-flex">
+                <button type="button" class="btn btn-primary m-1" onClick={e => sendEndStowSessionRequest(setStage, setFormData, setMessage)} data-bs-dismiss="modal">Yes</button>
+                <button type="button" class="btn btn-primary m-1" onClick={e => setStage(STOW_MOVE_CONTAINERS_ENDSESSION)} data-bs-dismiss="modal">No</button>
+            </div>
+            ]}>
+            Are all containers empty ?
+        </ShowModal>
     </div>
 }
