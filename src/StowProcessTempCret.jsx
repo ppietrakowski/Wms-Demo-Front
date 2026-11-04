@@ -370,8 +370,33 @@ export function StowProcessCretLike({ user }) {
     let [message, setMessage] = useState({ type: 'primary' })
     let [stage, setStage] = useState(STOW_SCAN_DROPZONE)
     let [formData, setFormData] = useState({})
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        api.post('get-stow-session/')
+            .then(v => {
+                const containers = v.data['containers']
+                setFormData({ ...formData, containers, continue: true })
+                if (containers.length > 0) {
+                    setStage(STOW_SCAN_CONTAINER)
+                }
+
+                setLoading(false)
+            })
+    }, [])
+
+    if (loading) {
+
+        return <div className='position-absolute translate-middle top-50 start-50 justify-content-center align-items-center d-flex'>
+            <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
 
     const Component = StagesComponents[stage] || ErrorScan
+
+
 
     return <div className="">
         <ApplicationHeader operationStatus={message.type} user={user} header={'Stow'} displayOptionsMenu={true}>
