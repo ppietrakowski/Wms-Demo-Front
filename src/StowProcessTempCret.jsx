@@ -3,6 +3,7 @@ import { ApplicationHeader } from "./ApplicationHeader.jsx";
 import { Form } from "./Form.jsx";
 import { InlineMessage } from "./InlineMessage.jsx";
 import { api } from "./api.jsx";
+import { Link } from "react-router-dom";
 
 
 const STOW_SCAN_DROPZONE = 0
@@ -264,6 +265,25 @@ const StagesComponents = [
     StowScanLocation
 ]
 
+function ShowModal() {
+    return <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog  modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">End stow session</h5>
+                </div>
+                <div class="modal-body">
+                    Do you want to close stow session ? If yes remember to make sure containers are empty
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 export function StowProcessCretLike({ user }) {
     let [message, setMessage] = useState({ type: 'primary' })
     let [stage, setStage] = useState(STOW_SCAN_DROPZONE)
@@ -273,9 +293,20 @@ export function StowProcessCretLike({ user }) {
 
     return <div className="">
         <ApplicationHeader operationStatus={message.type} user={user} header={'Stow'} displayOptionsMenu={true}>
+            {
+                stage <= STOW_SCAN_CONTAINER ?
+                    (<div></div>) :
+                    (
+                        <div>
+                            <button className="dropdown-item" data-bs-toggle="modal" data-bs-target="#staticBackdrop">End stow session</button>
+                            <button className="dropdown-item">Move containers</button>
+                        </div>
+                    )
+            }
+
         </ApplicationHeader>
         {message.message && <InlineMessage message={message.message} type={message.type} />}
-
         <Component user={user} message={message} formData={formData} setFormData={setFormData} setStage={setStage} stage={stage} setMessage={setMessage} />
+        <ShowModal />
     </div>
 }
