@@ -201,8 +201,7 @@ function StowScanLocation({ setMessage, setFormData, formData, setStage }) {
             setStage(3)
             return;
         }
-
-        if (code.startsWith('bin')) {
+        else if (code.startsWith('bin')) {
 
             api.post('stow-item/', {
                 container: formData.activeContainer,
@@ -216,6 +215,9 @@ function StowScanLocation({ setMessage, setFormData, formData, setStage }) {
                 .catch(e => {
                     setMessage({ message: e.response.data['reason'], type: 'error' })
                 })
+        }
+        else {
+            setMessage({ message: 'Invalid code. Please scan location or container', type: 'error' })
         }
     }
 
