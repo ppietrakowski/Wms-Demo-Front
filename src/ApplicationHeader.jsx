@@ -33,22 +33,24 @@ async function handleLogout() {
 export function ApplicationHeader({ user, operationStatus, header, displayOptionsMenu, children }) {
 
     let style = {
-        filter: 'brightness(0.9)',
         gridTemplateColumns: '1fr auto 1fr',
         /* Workaround for alerts */
         zIndex: 1660
     }
 
-    if (operationStatus == 'primary') {
-        style['color'] = 'white'
+    const classes = [`d-grid align-items-center navbar navbar-light px-3`]
+
+    if (operationStatus == 'success') {
+        classes.push(`bg-success text-white`)
+    }
+    else if (operationStatus == 'danger' || operationStatus == 'error') {
+        classes.push('bg-danger text-white')
+    }
+    else {
+        classes.push(`navbar-bg-primary`)
     }
 
-    if (operationStatus == 'danger') {
-        style['filter'] = 'brightness(0.8)'
-        style['color'] = 'white'
-    }
-
-    return <div className={`d-grid align-items-center navbar navbar-light bg-${operationStatus}-subtle px-3`} style={style}>
+    return <div className={classes.join(' ')} style={style}>
         {
             displayOptionsMenu ?
                 (

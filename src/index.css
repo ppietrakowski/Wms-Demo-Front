@@ -30,3 +30,13 @@ code {
   /* Wyrzuca menu na samą górę */
   position: absolute;
 }
+
+.navbar-bg-primary {
+  background-color: rgb(0, 33, 61);
+  color: white
+}
+
+.navbar-bg-warning {
+  background-color: rgb(249, 171, 61);
+  color: rgb(60, 28, 9)
+}
