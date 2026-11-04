@@ -11,6 +11,8 @@ const STOW_SCAN_CONTAINERS = 1
 const STOW_SCAN_CONTAINER = 2
 const STOW_SCAN_ITEM = 3
 const STOW_SCAN_LOCATION = 4
+const STOW_SCAN_MOVE_TO_DROPZONE_CONTAINERS = 5
+const STOW_SCAN_MOVE_TO_DROPZONE_DROPZONE = 6
 
 export function StowScanDropzone({ setMessage, setFormData, formData, setStage }) {
     async function onSubmit(params) {
@@ -53,6 +55,14 @@ function StowScanNextContainer({ setMessage, setFormData, formData, setStage }) 
         setFormData({ ...formData, activeContainer: code })
         setStage(STOW_SCAN_ITEM)
     }
+
+    useEffect(() => {
+        if (!formData.continue && formData.containers.length == 1) {
+            setMessage({ message: `Selected container ${formData.containers[0]}`, type: 'success' })
+            setFormData({ ...formData, activeContainer: formData.containers[0] })
+            setStage(STOW_SCAN_ITEM)
+        }
+    }, [])
 
     return <Form positionedAtCentered={true} submitCallback={e => onSubmit(e)}>
         <InputText className="hidden" type="text" submitElementKey="container" maxLength={12}>
@@ -147,6 +157,41 @@ function StowScanLocation({ setMessage, setFormData, formData, setStage }) {
     }
 }
 
+function StowMoveContainers({ setMessage, setFormData, formData, setStage }) {
+    return <ScanContainers setMessage={setMessage} onFinishedScanning={containers => {
+        setFormData({ ...formData, move_containers: containers })
+        setStage(STOW_SCAN_MOVE_TO_DROPZONE_DROPZONE)
+    }
+    } />
+}
+
+function StowMoveContainersDropzone({ setMessage, setFormData, formData, setStage }) {
+    async function onSubmit(params) {
+        const data = await api.post('stow-move-containers/', {
+            'containers': formData.move_containers,
+            'dropzone': params.getString('dropzone')
+        })
+        const containers = formData.containers.filter(e => !formData.move_containers.some(v => e == v))
+
+        setFormData({ ...formData, containers })
+
+        setMessage({ message: `Dropped containers`, type: 'success' })
+
+        if (containers.length == 0) {
+            setFormData({})
+            setStage(STOW_SCAN_DROPZONE)
+        } else {
+            setStage(STOW_SCAN_CONTAINER)
+        }
+    }
+
+    return <Form positionedAtCentered={true} submitCallback={e => onSubmit(e)}>
+        <InputText className="hidden" type="text" maxLength={12} submitElementKey={'dropzone'}>
+            Scan Dropzone
+        </InputText>
+    </Form>
+}
+
 export function Stow({ user }) {
     let [message, setMessage] = useState({ type: '' })
     let [stage, setStage] = useState(0)
@@ -177,6 +222,12 @@ export function Stow({ user }) {
 
     return <div className="d-flex flex-column h-100">
         <ApplicationHeader header="Stow" user={user} displayOptionsMenu={true} operationStatus="primary">
+            {
+                (stage > STOW_SCAN_CONTAINER) ? (
+                    <button className="text-white dropdown-item fs-6" onClick={e => setStage(STOW_SCAN_MOVE_TO_DROPZONE_CONTAINERS)}>Move containers</button>
+                ) : (<div></div>)
+            }
+
         </ApplicationHeader>
         {message.message && <InlineMessage message={message.message} type={message.type} />}
         {stage == STOW_SCAN_DROPZONE && <StowScanDropzone setStage={setStage} formData={formData} setFormData={setFormData} setMessage={setMessage} />}
@@ -184,6 +235,8 @@ export function Stow({ user }) {
         {stage == STOW_SCAN_CONTAINER && <StowScanNextContainer setStage={setStage} formData={formData} setFormData={setFormData} setMessage={setMessage} />}
         {stage == STOW_SCAN_ITEM && <StowScanProduct setStage={setStage} formData={formData} setFormData={setFormData} setMessage={setMessage} />}
         {stage == STOW_SCAN_LOCATION && <StowScanLocation setStage={setStage} formData={formData} setFormData={setFormData} setMessage={setMessage} />}
+        {stage == STOW_SCAN_MOVE_TO_DROPZONE_CONTAINERS && <StowMoveContainers setStage={setStage} formData={formData} setFormData={setFormData} setMessage={setMessage} />}
+        {stage == STOW_SCAN_MOVE_TO_DROPZONE_DROPZONE && <StowMoveContainersDropzone setStage={setStage} formData={formData} setFormData={setFormData} setMessage={setMessage} />}
 
         {formData.activeContainer && !formData.theme && <footer className="footer bg-secondary-subtle ps-2 p-1 w-100 position-absolute bottom-0">
             <span className="text-muted">{formData.activeContainer}</span>
