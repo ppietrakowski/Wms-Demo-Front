@@ -16,6 +16,7 @@ const STOW_SCAN_LOCATION = 4
 const STOW_MOVE_CONTAINERS = 5
 const STOW_MOVE_CONTAINERS_DROPZONE = 6
 const STOW_MOVE_CONTAINERS_ENDSESSION = 7
+const STOW_MOVE_CONTAINERS_SHOWOVERFLOW = 8
 
 function StowScanDropzone({ user, setMessage, setStage, setFormData, formData, stage }) {
     function submit(dropzone) {
@@ -116,6 +117,8 @@ function StowScanProduct({ setMessage, setFormData, formData, setStage }) {
                 setStage(STOW_SCAN_LOCATION)
             })
             .catch(e => {
+                setMessage({ message: 'Overflow detected !', type: 'error' })
+                setStage(STOW_MOVE_CONTAINERS_SHOWOVERFLOW)
             })
     }
 
@@ -270,6 +273,20 @@ function StowMoveContainersScanDropzone({ user, setMessage, setStage, setFormDat
     </ScanFormText>
 }
 
+function StowShowOverflow({ user, setMessage, setStage, setFormData, formData, stage }) {
+    function returnToStow() {
+        setMessage({})
+        setStage(STOW_SCAN_ITEM)
+    }
+    return <div className="translate-middle top-50 start-50 position-absolute d-flex flex-column">
+        <div>
+            Overflow detected. Please give container {formData.activeContainer} to Problem Solver.
+        </div>
+        <button className="btn btn-primary" onClick={e => returnToStow()}>Ok</button>
+    </div>
+
+}
+
 const StagesComponents = [
     StowScanDropzone,
     StowScanContainers,
@@ -279,6 +296,7 @@ const StagesComponents = [
     StowMoveContainers,
     StowMoveContainersScanDropzone,
     StowMoveContainers,
+    StowShowOverflow
 ]
 
 export function Stow({ user }) {
