@@ -61,7 +61,7 @@ function ScanFormText({ outputName, onSubmit, children, className }) {
             left: '-9999px',
             opacity: 0,
             pointerEvents: 'none',
-        }}>
+        }} autoComplete="false">
 
         </input>
     </div>
