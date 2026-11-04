@@ -4,7 +4,9 @@ import { Form } from "./Form.jsx";
 import { InlineMessage } from "./InlineMessage.jsx";
 import { api } from "./api.jsx";
 import { Link } from "react-router-dom";
-
+import ScanFormText from "./ScanFormText.jsx";
+import TextAccentLastChars from "./TextAccentLastChars.jsx";
+import ShowModal from "./ShowModal.jsx";
 
 const STOW_SCAN_DROPZONE = 0
 const STOW_SCAN_CONTAINERS = 1
@@ -14,62 +16,6 @@ const STOW_SCAN_LOCATION = 4
 const STOW_MOVE_CONTAINERS = 5
 const STOW_MOVE_CONTAINERS_DROPZONE = 6
 const STOW_MOVE_CONTAINERS_ENDSESSION = 7
-
-
-
-function restoreFocus(inputRef) {
-    if (inputRef.current)
-        inputRef.current.focus()
-}
-
-function ScanFormText({ outputName, onSubmit, children, className }) {
-    const inputRef = useRef(null);
-
-    useEffect(() => {
-        restoreFocus(inputRef)
-
-        const handleDocumentClick = () => {
-            restoreFocus(inputRef)
-        }
-
-        document.addEventListener('click', handleDocumentClick)
-
-        return () => {
-            document.removeEventListener('click', handleDocumentClick);
-        }
-    }, []);
-
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter') {
-            const code = e.target.value.trim();
-
-            if (code) {
-                onSubmit(code)
-            }
-
-            // Wyczyść pole
-            e.target.value = '';
-        }
-    };
-
-    const classes = ['position-absolute top-50 start-50 translate-middle d-flex flex-column justify-content-between']
-
-    if (className) {
-        classes.push(className)
-    }
-
-    return <div className={classes.join(' ')}>
-        {children}
-        <input ref={inputRef} name={outputName} autoFocus={true} onKeyDown={e => handleKeyDown(e)} style={{
-            position: 'absolute',
-            left: '-9999px',
-            opacity: 0,
-            pointerEvents: 'none',
-        }} autoComplete="false">
-
-        </input>
-    </div>
-}
 
 function StowScanDropzone({ user, setMessage, setStage, setFormData, formData, stage }) {
     function submit(dropzone) {
@@ -142,18 +88,6 @@ function StowScanNextContainer({ setMessage, setFormData, formData, setStage }) 
     </ScanFormText>
 }
 
-function TextAccentLastChars({ text, numChars = 4, className, boldClassName }) {
-    const boldClass = ['fw-bold']
-
-    if (boldClassName) {
-        boldClass.push(boldClassName)
-    }
-
-    return <div className={className}>
-        {text.substring(0, text.length - numChars)}
-        <span className={boldClass.join(' ')}>{text.substring(text.length - numChars)}</span>
-    </div>
-}
 
 
 function StowScanProduct({ setMessage, setFormData, formData, setStage }) {
@@ -259,25 +193,6 @@ function ErrorScan({ setMessage, formData }) {
     </div>
 }
 
-
-function ShowModal({ title, children, buttons, id }) {
-    return <div class="modal fade" id={id} data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">{title}</h5>
-                </div>
-                <div class="modal-body">
-                    {children}
-
-                </div>
-                <div class="modal-footer d-flex justify-content-between">
-                    {buttons}
-                </div>
-            </div>
-        </div>
-    </div>
-}
 
 function StowMoveContainers({ setMessage, setFormData, formData, setStage, message, stage }) {
     const [containers, setContainers] = useState([])
@@ -395,8 +310,6 @@ export function Stow({ user }) {
     }
 
     const Component = StagesComponents[stage] || ErrorScan
-
-
 
     return <div className="">
         <ApplicationHeader operationStatus={message.type} user={user} header={'Stow'} displayOptionsMenu={true}>

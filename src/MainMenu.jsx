@@ -54,7 +54,6 @@ function SelectApplication() {
         <ApplicationCategory name='Utilities'>
             <CategoryElement name='Display code128' />
             <CategoryElement name='Print code128' />
-            <CategoryElement name='[Debug] Display inline message' />
         </ApplicationCategory>
     </div>
 }
