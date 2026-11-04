@@ -43,6 +43,11 @@ export function ApplicationHeader({ user, operationStatus, header, displayOption
         style['color'] = 'white'
     }
 
+    if (operationStatus == 'danger') {
+        style['filter'] = 'brightness(0.8)'
+        style['color'] = 'white'
+    }
+
     return <div className={`d-grid align-items-center navbar navbar-light bg-${operationStatus}-subtle px-3`} style={style}>
         {
             displayOptionsMenu ?
