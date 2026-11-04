@@ -40,3 +40,49 @@ code {
   background-color: rgb(249, 171, 61);
   color: rgb(60, 28, 9)
 }
+
+.border-cret {
+  position: relative;
+  /* Beżowe/kremowe tło jak na zdjęciu */
+  border-bottom: 2px solid var(--bs-secondary);
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  /* Margines na dole, żeby uszko nie nałożyło się na kolejny element */
+  text-align: center;
+}
+
+/* 1. Zewnętrzny trójkąt (obramowanie uszka) */
+.border-cret::before {
+  content: "";
+  position: absolute;
+  bottom: -12px;
+  /* Wypychamy idealnie na dół poza granicę ramki (zależne od grubości borderu) */
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 12px solid var(--bs-secondary);
+  /* Kolor IDENTYCZNY jak obramowanie kontenera */
+  z-index: 2;
+}
+
+/* 2. Wewnętrzny trójkąt maskujący (wypełnienie tłem), żeby obramowanie nie szło środkiem */
+.border-cret::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  /* O 1px wyżej niż border, żeby schować środek */
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 12px solid var(--bs-white);
+  /* Kolor IDENTYCZNY jak tło kontenera */
+  z-index: 3;
+}

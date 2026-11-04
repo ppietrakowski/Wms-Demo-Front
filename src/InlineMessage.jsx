@@ -11,13 +11,16 @@ function getIconForMessage(type) {
     return icons[type] || <div></div>
 }
 
+const MapTypes = {
+    'info': 'primary',
+    'error': 'danger'
+}
 export function InlineMessage({ message, type }) {
-    if (type == 'info') {
-        type = 'primary'
-    }
 
-    let icon = getIconForMessage(type)
-    return <div className={`alert alert-${type} rounded-0 border-0`}>
+    const t = MapTypes[type] || type
+
+    let icon = getIconForMessage(t)
+    return <div className={`alert alert-${t} rounded-0 border-0`}>
         {icon}
         <span>{message}</span>
     </div>
