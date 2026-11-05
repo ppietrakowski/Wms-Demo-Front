@@ -43,18 +43,19 @@ function ScanProducts({ formData, setFormData, setMessage, setStage }) {
 
             setCount(count + 1)
         })
-    }
+    } i,
 
-    function onScannedAllProducts() {
-        api.put('add-items-container/', {
-            container: formData.container,
-            products: products
-        })
-            .then(response => {
-                setMessage({ message: `Inserted ${count} items to ${formData.container}`, type: 'success' })
-                setStage(SCAN_CONTAINER)
+
+        function onScannedAllProducts() {
+            api.put('add-items-container/', {
+                container: formData.container,
+                products: products
             })
-    }
+                .then(response => {
+                    setMessage({ message: `Inserted ${count} items to ${formData.container}`, type: 'success' })
+                    setStage(SCAN_CONTAINER)
+                })
+        }
 
     return <ScanFormText onSubmit={product => submit(product)} outputName={'dropzone'} className={'w-100 p-1'}>
         <span className="d-flex justify-content-center fw-bold">Scan products</span>
