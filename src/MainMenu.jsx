@@ -53,8 +53,7 @@ function SelectApplication() {
             <CategoryElement name='Create container with objects' redirectionAddress={'/create-container'} />
         </ApplicationCategory>
         <ApplicationCategory name='Utilities'>
-            <CategoryElement name='Display code128' />
-            <CategoryElement name='Print code128' />
+            <CategoryElement name='Create product code' redirectionAddress={'/create-product-empty'} />
         </ApplicationCategory>
     </div>
 }
