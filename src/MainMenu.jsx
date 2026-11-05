@@ -50,6 +50,7 @@ function SelectApplication() {
         <ApplicationCategory name='ICQA'>
             <CategoryElement name='FC Research' />
             <CategoryElement name='Count products in location' />
+            <CategoryElement name='Create container with objects' redirectionAddress={'/create-container'} />
         </ApplicationCategory>
         <ApplicationCategory name='Utilities'>
             <CategoryElement name='Display code128' />
