@@ -6,6 +6,8 @@ import InputText from './InputText.jsx';
 import { api } from './api.jsx';
 import React from 'react';
 import { useState } from 'react';
+import ScanFormText from './ScanFormText.jsx';
+import ShowModal from './ShowModal.jsx';
 
 const RS_SCAN_SHIP_ID = 0
 const RS_SCAN_ITEM_ID = 1
@@ -20,9 +22,8 @@ const PSR_OTHER = 3
 
 
 function ReceiveScanID({ user, setStage, setFormData, setMessage }) {
-    async function onSubmitForm(e) {
+    async function submit(shipId) {
         try {
-            const shipId = e.getString('ship_id')
             const response = await api.post('get_receive_products/', { 'ship_id': shipId })
             const { products, message, type } = response.data
 
@@ -42,53 +43,42 @@ function ReceiveScanID({ user, setStage, setFormData, setMessage }) {
     }
 
 
-    return <div>
-        <Form positionedAtCentered={true} submitCallback={e => onSubmitForm(e)}>
-            <InputText type='text' submitElementKey='ship_id' maxLength={12}>
-                Scan Ship ID
-            </InputText>
-        </Form>
-    </div>
+    return <ScanFormText onSubmit={shipId => submit(shipId)} outputName={'dropzone'} className={'w-100 p-1'}>
+        <span className="d-flex justify-content-center">Scan Ship Id</span>
+    </ScanFormText>
 }
 
 function ReceiveItemID({ user, setStage, formData, setFormData, setMessage }) {
-    async function onSubmit(e) {
-        const itemId = e.getString('item_id')
-        const p = await api.get(`get-product/${itemId}/`)
-        console.log(p.data)
-        console.log(formData.products)
-        const index = formData.products.findIndex(v => v.code == p.data.product['id'])
-        if (index == -1) {
-            setFormData({ psrReason: PSR_OVERFLOW, ...formData })
-            setStage(RS_SCAN_PROBLEM_CODE)
-            setMessage({ message: 'Overflow detected', type: 'danger' })
-        }
-        else {
-            if (formData.products[index].current_count <= 0) {
-                setMessage({ message: 'No such item', type: 'danger' })
+    async function submit(itemId) {
+        api.get(`get-product/${itemId}/`).then(p => {
+            const index = formData.products.findIndex(v => v.code == p.data.product['id'])
+            if (index == -1) {
+                setFormData({ psrReason: PSR_OVERFLOW, ...formData })
+                setStage(RS_SCAN_PROBLEM_CODE)
+                setMessage({ message: 'Overflow detected', type: 'danger' })
             }
             else {
-                setMessage({ 'type': 'success', 'message': `Selected item ${itemId}(${formData.products[index].code})` })
-                setFormData({ itemID: p.data.product['id'], shipID: formData.shipID, products: formData.products })
-                setStage(RS_SCAN_TOTE_ID)
+                if (formData.products[index].current_count <= 0) {
+                    setMessage({ message: 'No such item', type: 'danger' })
+                }
+                else {
+                    setMessage({ 'type': 'success', 'message': `Selected item ${itemId}(${formData.products[index].code})` })
+                    setFormData({ itemID: p.data.product['id'], shipID: formData.shipID, products: formData.products })
+                    setStage(RS_SCAN_TOTE_ID)
+                }
             }
-        }
+        }).catch(e => console.log(e))
     }
 
-    return <div>
-        <Form positionedAtCentered={true} submitCallback={e => onSubmit(e)}>
-            <InputText type='text' submitElementKey='item_id' maxLength={13}>
-                Scan Item ID
-            </InputText>
-        </Form>
-    </div>
+    return <ScanFormText onSubmit={itemId => submit(itemId)} outputName={'dropzone'} className={'w-100 p-1'}>
+        <span className="d-flex justify-content-center">Scan Item Id</span>
+    </ScanFormText>
 }
 
 
 function ReceiveScanToteID({ user, setStage, formData, setFormData, setMessage }) {
 
-    async function onSubmit(e) {
-        const toteId = e.getString('tote_id')
+    async function submit(toteId) {
 
         if (!toteId.startsWith('ts')) {
             setMessage({ 'message': 'Invalid container, please scan tote ID with \'ts\' code', 'type': 'danger' })
@@ -135,40 +125,27 @@ function ReceiveScanToteID({ user, setStage, formData, setFormData, setMessage }
 
     }
 
-    return <div>
-        <Form positionedAtCentered={true} submitCallback={e => onSubmit(e)}>
-            <InputText type='text' submitElementKey='tote_id' maxLength={12}>
-                Scan Sellable Tote Id
-            </InputText>
-        </Form>
-    </div>
+    return <ScanFormText onSubmit={toteId => submit(toteId)} outputName={'dropzone'} className={'w-100 p-1'}>
+        <span className="d-flex justify-content-center">Scan Sellable Tote Id</span>
+    </ScanFormText>
 }
 
 export function ReceiveProblemMenu({ setStage, setFormData, formData, setMessage }) {
-    async function onSubmit(reason) {
-        setFormData({ psrReason: reason, ...formData })
-        setStage(RS_SCAN_PROBLEM_CODE)
-    }
+
 
     const buttonClass = 'btn btn-lg btn-dark w-100 rounded-0'
 
-    return <div className='vw-100 position-absolute top-50 start-50 translate-middle max-w-md d-flex justify-content-center align-items-center flex-column'>
-        <h1>Select problem reason</h1>
-        <button className={buttonClass} onClick={e => onSubmit(PSR_DAMAGED)}>Product damaged</button>
-        <button className={buttonClass} onClick={e => onSubmit(PSR_DAMAGED_CODE)}>Damaged code</button>
-        <button className={buttonClass} onClick={e => onSubmit(PSR_OTHER)}>Other</button>
-        <button className='btn btn-lg btn-dark w-100 rounded-0' onClick={e => { setStage(RS_SCAN_ITEM_ID); setMessage({ type: '' }) }}>Cancel</button>
-    </div>
+    return
 }
 
 
 export function ReceiveScanProblemId({ setStage, setFormData, formData, setMessage }) {
-    async function onSubmit(e) {
+    async function submit(psrId) {
         try {
-            const response = await api.put('receive/ps-raise', {
+            await api.put('receive/ps-raise', {
                 reason: formData.psrReason,
                 ship_id: formData.shipID,
-                psr_id: e.getString('psr_id'),
+                psr_id: psrId,
             })
             setMessage({ message: e.response?.data.message, 'type': 'error' })
         } catch (e) {
@@ -176,15 +153,14 @@ export function ReceiveScanProblemId({ setStage, setFormData, formData, setMessa
         }
 
         setFormData({ ...formData, itemID: '' })
-        setMessage({ message: `Send product ${e.getString('psr_id')} to Problem Solve`, type: 'success' })
+        setMessage({ message: `Send product ${psrId} to Problem Solve`, type: 'success' })
         setStage(RS_SCAN_ITEM_ID)
     }
 
-    return <Form positionedAtCentered={true} submitCallback={e => onSubmit(e)}>
-        <InputText type='text' submitElementKey='psr_id' maxLength={12}>
-            Scan Problem ID
-        </InputText>
-    </Form>
+    return <ScanFormText onSubmit={problemId => submit(problemId)} outputName={'dropzone'} className={'w-100 p-1'}>
+        <span className="d-flex justify-content-center">Scan Problem Id</span>
+        <button className='w-100 btn btn-secondary mt-5' onClick={e => setStage(RS_SCAN_ITEM_ID)}>Cancel</button>
+    </ScanFormText>
 }
 
 export function Receive({ user }) {
@@ -193,14 +169,17 @@ export function Receive({ user }) {
     let [formData, setFormData] = useState({ itemID: '', products: [], shipID: '' })
 
     let [message, setMessage] = useState({ type: 'danger' })
-
+    function submitPSRReason(reason) {
+        setFormData({ psrReason: reason, ...formData })
+        setStage(RS_SCAN_PROBLEM_CODE)
+    }
     const StagesWithProblemSolveButton = [RS_SCAN_ITEM_ID, RS_SCAN_TOTE_ID]
 
     return <div>
         <ApplicationHeader user={user} header='Receive' operationStatus='primary' displayOptionsMenu={true}>
             {
                 (StagesWithProblemSolveButton.some(v => v == stage)) ?
-                    <button className='dropdown-item fs-6' onClick={e => setStage(RS_DISPLAY_PROBLEM_SCREEN)}>Report problem</button> :
+                    <button className='dropdown-item fs-6' data-bs-toggle="modal" data-bs-target="#raise-error">Report problem</button> :
                     <></>
             }
         </ApplicationHeader>
@@ -208,8 +187,17 @@ export function Receive({ user }) {
         {(stage == RS_SCAN_SHIP_ID) && <ReceiveScanID setMessage={setMessage} formData={formData} setFormData={setFormData} user={user} setStage={setStage} />}
         {(stage == RS_SCAN_ITEM_ID) && <ReceiveItemID setMessage={setMessage} formData={formData} setFormData={setFormData} user={user} setStage={setStage} />}
         {(stage == RS_SCAN_TOTE_ID) && <ReceiveScanToteID setMessage={setMessage} formData={formData} setFormData={setFormData} user={user} setStage={setStage} />}
-        {(stage == RS_DISPLAY_PROBLEM_SCREEN) && <ReceiveProblemMenu setMessage={setMessage} formData={formData} setFormData={setFormData} user={user} setStage={setStage} />}
         {(stage == RS_SCAN_PROBLEM_CODE) && <ReceiveScanProblemId setMessage={setMessage} formData={formData} setFormData={setFormData} user={user} setStage={setStage} />}
-
+        <ShowModal id={'raise-error'} title={'Select problem reason'} buttons={
+            [
+                <div className="d-flex">
+                    <button type="button" class="btn btn-primary m-1" onClick={e => submitPSRReason(PSR_DAMAGED)} data-bs-dismiss="modal">Damaged</button>
+                    <button type="button" class="btn btn-primary m-1" onClick={e => submitPSRReason(PSR_DAMAGED_CODE)} data-bs-dismiss="modal">Damaged Code</button>
+                    <button type="button" class="btn btn-primary m-1" onClick={e => submitPSRReason(PSR_OTHER)} data-bs-dismiss="modal">Other</button>
+                    <button type="button" class="btn btn-primary m-1" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            ]}>
+            Select reason for report problem
+        </ShowModal>
     </div>
 }

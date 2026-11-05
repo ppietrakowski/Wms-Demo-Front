@@ -240,6 +240,9 @@ function sendEndStowSessionRequest(setStage, setFormData, setMessage) {
             setMessage({ message: 'Finished stowing !', type: 'success' })
             setStage(STOW_SCAN_DROPZONE)
         })
+        .catch(e => {
+            setMessage({ message: e.response.data['reason'], type: 'error' })
+        })
 }
 
 function StowMoveContainersScanDropzone({ user, setMessage, setStage, setFormData, formData, stage }) {
