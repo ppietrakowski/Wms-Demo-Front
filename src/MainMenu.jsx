@@ -48,7 +48,7 @@ function SelectApplication() {
             <CategoryElement name='Ship' />
         </ApplicationCategory>
         <ApplicationCategory name='ICQA'>
-            <CategoryElement name='FC Research' />
+            <CategoryElement name='Display container items' redirectionAddress={'/show-container-items'} />
             <CategoryElement name='Count products in location' />
             <CategoryElement name='Create container with objects' redirectionAddress={'/create-container'} />
         </ApplicationCategory>

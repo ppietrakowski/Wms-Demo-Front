@@ -7,6 +7,7 @@ import { api } from './api.jsx';
 import { MoveToDropzone } from './MoveToDropZone.jsx';
 import { Stow } from './StowProcess.jsx';
 import CreateContainerItems from './CreateContainerItems.jsx';
+import ShowContainerItems from './ShowContainerItems.jsx';
 
 
 
@@ -63,6 +64,7 @@ function Application() {
             <ReactRouter.Route path='/move-dropzone' element={<MoveToDropzone user={user} />} />
             <ReactRouter.Route path='/stow' element={<Stow user={user} />} />
             <ReactRouter.Route path='/create-container' element={<CreateContainerItems user={user} />} />
+            <ReactRouter.Route path='/show-container-items' element={<ShowContainerItems user={user} />} />
 
             <ReactRouter.Route path='/login' element={<ReactRouter.Navigate to='/menu' replace />} />
 
