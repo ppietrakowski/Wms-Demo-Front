@@ -37,7 +37,7 @@ function ShowContainerContent({ formData, setFormData }) {
         <ScanFormText onSubmit={container => onSubmit(container)} outputName={'container'} className={'w-100 p-3'}>
         </ScanFormText>
 
-        <div className="table-responsive" style={{ maxHeight: '50vw', overflowY: 'auto' }}>
+        <div className="table-responsive m-1" style={{ maxHeight: '33vw', overflowY: 'auto' }}>
             <table className="table table-striped">
                 <thead className="sticky-top">
                     <tr>

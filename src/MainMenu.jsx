@@ -51,6 +51,7 @@ function SelectApplication() {
             <CategoryElement name='Display container items' redirectionAddress={'/show-container-items'} />
             <CategoryElement name='Count products in location' />
             <CategoryElement name='Create container with objects' redirectionAddress={'/create-container'} />
+            <CategoryElement name='Move product to container' redirectionAddress={'/move-container-product'} />
         </ApplicationCategory>
         <ApplicationCategory name='Utilities'>
             <CategoryElement name='Create product code' redirectionAddress={'/create-product-empty'} />

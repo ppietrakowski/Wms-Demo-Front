@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import ScanFormText from "./ScanFormText.jsx";
 import TextAccentLastChars from "./TextAccentLastChars.jsx";
 import ShowModal from "./ShowModal.jsx";
+import { ActiveContainerAddOn } from "./ActiveContainerAddOn.jsx";
 
 const STOW_SCAN_DROPZONE = 0
 const STOW_SCAN_CONTAINERS = 1
@@ -63,7 +64,8 @@ function StowScanContainers({ message, setMessage, setStage, setFormData, formDa
 
     return <ScanFormText onSubmit={dropzone => submit(dropzone)} outputName={'dropzone'} className={'w-100 p-1'}>
         <span className="d-flex justify-content-center fw-bold">Scan containers</span>
-        {containers.length &&
+        <span className="d-flex justify-content-center">Num scanned containers: {containers.length}</span>
+        {!!containers.length &&
             <span className="d-flex justify-content-center">Last scanned container:
                 <span className="fw-bold ps-1">{containers[containers.length - 1]}</span></span>}
         <button className="btn btn-primary pt-3 pb-3" onClick={e => onScannedAllContainers()}>Scanned all containers</button>
@@ -124,7 +126,7 @@ function StowScanProduct({ setMessage, setFormData, formData, setStage }) {
 
     const { activeContainer } = formData
     return <div className='h-100'>
-        <div className="position-absolute bottom-0 p-1 bg-dark text-white w-100">{activeContainer}</div>
+        <ActiveContainerAddOn container={activeContainer} />
         <ScanFormText outputName={'code'} onSubmit={code => onSubmit(code)}>
             Scan product or container
         </ScanFormText>
@@ -179,7 +181,7 @@ function StowScanLocation({ setMessage, setFormData, formData, setStage }) {
             </div>
             <div className="m-1">{productDetails.name}</div>
         </div>
-        <div className="position-absolute bottom-0 p-1 bg-dark text-white w-100">{activeContainer}</div>
+        <ActiveContainerAddOn container={activeContainer} />
         <ScanFormText outputName={'code'} onSubmit={code => onSubmit(code)}>
             Scan location
         </ScanFormText>
