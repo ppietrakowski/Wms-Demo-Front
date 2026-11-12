@@ -73,8 +73,7 @@ function ScanProductDestinationContainer({ setFormData, setMessage, formData, mo
         const count = (moveMode == MOVE_MODE_ALL_PRODUCT) ? formData.product.count : 1
         api.post('stow-item/', {
             container: formData.sourceContainer,
-            item: formData.product.id,
-            count: count,
+            products: [{id: formData.product.id, count}],
             target_bin: destinationContainer
         })
             .then(response => {
@@ -99,14 +98,11 @@ function ScanDestinationContainer({ setFormData, setMessage, formData, moveMode,
         })
             .then(async v => {
 
-                for (const product of v.data.products) {
-                    await api.post('stow-item/', {
+                await api.post('stow-item/', {
                         container: formData.sourceContainer,
-                        item: product.id,
-                        count: product.count,
+                        products: v.data.products.map(p => {return {id: p.id, count: p.count}}),
                         target_bin: destinationContainer
-                    })
-                }
+                })
                 setMessage({ message: `Moved products from ${formData.sourceContainer} to ${destinationContainer}`, type: 'success' })
                 setFormData({});
                 advanceStage();

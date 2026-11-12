@@ -147,8 +147,7 @@ function StowScanLocation({ setMessage, setFormData, formData, setStage }) {
 
             api.post('stow-item/', {
                 container: formData.activeContainer,
-                item: formData.productDetails.id,
-                count: 1,
+                products: [{id: formData.productDetails.id, count: 1}],
                 target_bin: code
             }).then(response => {
                 setMessage({ message: `Stowed item ${formData.code} in ${code}`, type: 'success' })
