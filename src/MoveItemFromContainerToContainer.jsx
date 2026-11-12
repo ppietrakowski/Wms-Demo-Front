@@ -4,6 +4,7 @@ import ScanFormText from "./ScanFormText.jsx";
 import ShowModal from "./ShowModal";
 import { InlineMessage } from "./InlineMessage.jsx";
 import { api } from "./api.jsx";
+import apiGetMessage from './apiGetMessage.jsx'
 
 const MOVE_MODE_SINGLE = 0
 const MOVE_MODE_ALL_PRODUCT = 1
@@ -81,7 +82,7 @@ function ScanProductDestinationContainer({ setFormData, setMessage, formData, mo
                 setFormData({});
                 advanceStage();
             })
-            .catch(e => setMessage({ message: e.toString(), type: 'danger' }))
+            .catch(e => setMessage({ message: apiGetMessage(e), type: 'danger' }))
     }
 
     return <ScanFormText outputName={'container'} onSubmit={destinationContainer => doMoveToContainer(destinationContainer)}>
@@ -107,7 +108,7 @@ function ScanDestinationContainer({ setFormData, setMessage, formData, moveMode,
                 setFormData({});
                 advanceStage();
             })
-            .catch(e => setMessage({ message: e.toString(), type: 'danger' }))
+            .catch(e => setMessage({ message: apiGetMessage(e), type: 'danger' }))
     }
 
     return <ScanFormText outputName={'container'} onSubmit={destinationContainer => doMoveToContainer(destinationContainer)}>

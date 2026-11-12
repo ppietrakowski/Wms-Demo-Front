@@ -5,7 +5,7 @@ import { Form } from './Form.jsx';
 import InputText from './InputText.jsx';
 import { FormButton } from './FormButton.jsx';
 import { InlineMessage } from './InlineMessage.jsx';
-import { getErrorMessage } from './apiGetMessage.jsx';
+import apiGetMessage from './apiGetMessage.jsx';
 
 
 export function Login({ onLoginSuccess, onLoginFailure }) {
@@ -22,7 +22,7 @@ export function Login({ onLoginSuccess, onLoginFailure }) {
             onLoginSuccess(user.data)
         } catch (err) {
             setInlineMessage({
-                message: `${getErrorMessage(err)}`,
+                message: `${apiGetMessage(err)}`,
                 type: 'danger'
             })
             onLoginFailure && onLoginFailure(err)

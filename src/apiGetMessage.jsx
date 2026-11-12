@@ -1,5 +1,5 @@
 
-export function getErrorMessage(error) {
+export default function apiGetMessage(error) {
     if (!error.response) {
         // Network failure, backend down, or CORS issue
         return 'Unable to connect to the server. Please check your internet connection.';
