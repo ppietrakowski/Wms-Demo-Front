@@ -101,11 +101,10 @@ function ReceiveScanToteID({ user, setStage, formData, setFormData, setMessage }
             return;
         }
 
-        api.post(`container/move-product/`, {
-            'count': 1,
-            'product': formData.itemID,
-            'destination_container': toteId,
-            'source_container': formData.shipID
+        api.post(`stow-item/`, {
+            'products': [ {id: formData.itemID, count: 1} ],
+            'target_bin': toteId,
+            'container': formData.shipID
         })
             .then(response => {
                 if (response.status == 200 || response.status == 201) {
