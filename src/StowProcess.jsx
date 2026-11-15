@@ -62,14 +62,38 @@ function StowScanContainers({ message, setMessage, setStage, setFormData, formDa
             })
     }
 
-    return <ScanFormText onSubmit={dropzone => submit(dropzone)} outputName={'dropzone'} className={'w-100 p-1'}>
-        <span className="d-flex justify-content-center fw-bold">Scan containers</span>
-        <span className="d-flex justify-content-center">Num scanned containers: {containers.length}</span>
-        {!!containers.length &&
-            <span className="d-flex justify-content-center">Last scanned container:
-                <span className="fw-bold ps-1">{containers[containers.length - 1]}</span></span>}
-        <button className="btn btn-primary pt-3 pb-3" onClick={e => onScannedAllContainers()}>Scanned all containers</button>
-    </ScanFormText>
+    if (containers.length == 0) {
+        return <ScanFormText onSubmit={container => submit(container)} outputName={'dropzone'} className={'text-center w-100 p-1'}>
+            Scan container
+        </ScanFormText>
+    }
+
+    return <div className="position-relative flex-grow-1 overflow-auto">
+        <div className="table-responsive m-1" style={{ maxHeight: '88%' }}>
+            <table className="table table-striped">
+                <thead className="sticky-top">
+                    <tr>
+                        <th scope="col">Index</th>
+                        <th scope="col">Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {containers.map((v, i) => <tr>
+                        <td>{i + 1}</td>
+                        <td>{v}</td>
+                    </tr>)
+                    }
+                </tbody>
+            </table>
+
+            <ScanFormText onSubmit={dropzone => submit(dropzone)} outputName={'dropzone'} className={'w-100 p-1'}>
+            </ScanFormText>
+        </div>
+        <div className="position-absolute bottom-0 start-0 w-100 d-flex flex-column p-2 ps-4 pe-4" style={{ background: 'var(--bs-gray-700)' }}>
+            <span className="position-relative w-100 text-center">Num scanned containers: {containers.length}</span>
+            <button className="btn btn-primary position-relative text-center w-100 rounded-0" onClick={e => onScannedAllContainers()}>Scanned all containers</button>
+        </div>
+    </div>
 }
 
 function StowScanNextContainer({ setMessage, setFormData, formData, setStage }) {
@@ -85,6 +109,7 @@ function StowScanNextContainer({ setMessage, setFormData, formData, setStage }) 
         setFormData({ ...formData, activeContainer: code })
         setStage(STOW_SCAN_ITEM)
     }
+
 
     return <ScanFormText onSubmit={container => onSubmit(container)} outputName={'container_tmp'}>
         Scan container
@@ -147,7 +172,7 @@ function StowScanLocation({ setMessage, setFormData, formData, setStage }) {
 
             api.post('stow-item/', {
                 container: formData.activeContainer,
-                products: [{id: formData.productDetails.id, count: 1}],
+                products: [{ id: formData.productDetails.id, count: 1 }],
                 target_bin: code
             }).then(response => {
                 setMessage({ message: `Stowed item ${formData.code} in ${code}`, type: 'success' })
@@ -172,17 +197,24 @@ function StowScanLocation({ setMessage, setFormData, formData, setStage }) {
     }, [])
 
 
-    return <div className='h-100'>
-        <div className="d-flex justify-content-between">
-            <div className="d-flex flex-column m-1">
-                <TextAccentLastChars className={'badge bg-primary'} text={formData.code} boldClassName={'fs-6'} />
-                <div>Weight: <span className="fw-bold">{productDetails.weight / 1000.0}</span> kg</div>
+    return <div className='h-100 fs-6'>
+        <div className="d-flex justify-content-between flex-column">
+            <span className="text-center w-100">Place <span className="fw-bold">item</span>, then scan <span className="fw-bold">bin</span></span>
+            <div className="m-2" style={{ padding: '1px', backgroundColor: 'var(--bs-gray-700)' }}></div>
+            <div className="d-flex justify-content-between">
+                <div className="w-25 d-flex flex-column"  style={{ height: '20vh', maxHeight: '20vh' }}>
+                    <div className="badge bg-primary">Blocking small in full shelf</div>
+                    <img src="product.png" alt="[Product Image]" className="mt-2 w-100" style={{ backgroundColor: 'var(--bs-gray-700)', height: '20vh', maxHeight: '20vh' }}></img>
+                </div>
+                <div className="d-flex flex-column m-1">
+                    <TextAccentLastChars className={'d-flex rounded-1 border fs-6'} text={formData.code} boldClassName={'border-start fs-5'} />
+                    <div>Weight: <span className="fw-bold">{productDetails.weight / 1000.0}</span> kg</div>
+                    <div className="m-1">{productDetails.name}</div>
+                </div>
             </div>
-            <div className="m-1">{productDetails.name}</div>
         </div>
         <ActiveContainerAddOn container={activeContainer} />
         <ScanFormText outputName={'code'} onSubmit={code => onSubmit(code)}>
-            Scan location
         </ScanFormText>
     </div>
 }
@@ -333,7 +365,7 @@ export function Stow({ user }) {
 
     const Component = StagesComponents[stage] || ErrorScan
 
-    return <div className="">
+    return <div className="base d-flex flex-column vh-100">
         <ApplicationHeader operationStatus={message.type} user={user} header={'Stow'} displayOptionsMenu={true}>
             {
                 stage <= STOW_SCAN_CONTAINER ?
