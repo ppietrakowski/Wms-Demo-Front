@@ -3,17 +3,18 @@ import { ApplicationHeader } from "./ApplicationHeader";
 import ScanFormText from "./ScanFormText";
 import { InlineMessage } from "./InlineMessage";
 import { api } from "./api";
+import isValidContainerType from "./ScanContainers";
 
 const SCAN_CONTAINER = 0
 const SCAN_PRODUCTS = 1
 
 function ScanContainer({ setMessage, setFormData, setStage }) {
     function submit(container) {
-        if (container.length < 12) {
+        if (container.length < 12 || !isValidContainerType(container)) {
             setMessage({ message: 'Invalid code, Please scan container code type', type: 'error' })
         }
         else {
-            setMessage({ message: `Selecting to container ${container}`, type: 'success' })
+            setMessage({ message: `Selected container ${container}`, type: 'success' })
             setFormData({ container });
             setStage(SCAN_PRODUCTS);
         }
@@ -61,7 +62,7 @@ function ScanProducts({ formData, setFormData, setMessage, setStage }) {
         <span className="d-flex justify-content-center fw-bold">Scan products</span>
         <span className="d-flex justify-content-center">Scanned {count} products</span>
         <button className="btn btn-primary pt-3 pb-3" onClick={e => onScannedAllProducts()}>Scanned all products</button>
-        <button className="btn btn-secondary pt-3 pb-3" onClick={e => setStage(STOW_SCAN_CONTAINER)}>Cancel</button>
+        <button className="btn btn-secondary pt-3 pb-3" onClick={e => setStage(0)}>Cancel</button>
     </ScanFormText>
 }
 

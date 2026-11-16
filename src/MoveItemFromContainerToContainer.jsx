@@ -9,6 +9,7 @@ import apiGetMessage from './apiGetMessage.jsx'
 const MOVE_MODE_SINGLE = 0
 const MOVE_MODE_ALL_PRODUCT = 1
 const MOVE_MODE_ALL_CONTAINER = 2
+const MOVE_CLEAR_CONTAINER = 3
 
 function ChangeModeButton({ text, currentMode, targetMode, setMode, setMessage }) {
     function changeMode() {
@@ -74,7 +75,7 @@ function ScanProductDestinationContainer({ setFormData, setMessage, formData, mo
         const count = (moveMode == MOVE_MODE_ALL_PRODUCT) ? formData.product.count : 1
         api.post('stow-item/', {
             container: formData.sourceContainer,
-            products: [{id: formData.product.id, count}],
+            products: [{ id: formData.product.id, count }],
             target_bin: destinationContainer
         })
             .then(response => {
@@ -100,9 +101,9 @@ function ScanDestinationContainer({ setFormData, setMessage, formData, moveMode,
             .then(async v => {
 
                 await api.post('stow-item/', {
-                        container: formData.sourceContainer,
-                        products: v.data.products.map(p => {return {id: p.id, count: p.count}}),
-                        target_bin: destinationContainer
+                    container: formData.sourceContainer,
+                    products: v.data.products.map(p => { return { id: p.id, count: p.count } }),
+                    target_bin: destinationContainer
                 })
                 setMessage({ message: `Moved products from ${formData.sourceContainer} to ${destinationContainer}`, type: 'success' })
                 setFormData({});
@@ -127,11 +128,30 @@ const ProductSingleStages = [
     ScanProductDestinationContainer
 ]
 
+function ScanClearContainer({ setMessage }) {
+    function onSubmitContainer(container) {
+        api.post('clear-container/', {
+            container
+        })
+            .then(() => setMessage({ message: 'Cleared container!', type: 'success' }))
+    }
+
+    return <ScanFormText outputName={'container'} onSubmit={container => onSubmitContainer(container)}>
+        Scan source container
+    </ScanFormText>
+}
+
+const RemoveProductMode = [
+    ScanClearContainer,
+]
+
 const StagesByMode = [
     ProductSingleStages,
     ProductSingleStages,
-    FullContainerStages
+    FullContainerStages,
+    RemoveProductMode
 ]
+
 
 export default function MoveItemFromContainerToContainer({ user }) {
 
@@ -156,6 +176,8 @@ export default function MoveItemFromContainerToContainer({ user }) {
                 <ChangeModeButton currentMode={mode} setMessage={setMessage} targetMode={MOVE_MODE_SINGLE} setMode={setMode} text={'Single move mode'} />
                 <ChangeModeButton currentMode={mode} setMessage={setMessage} targetMode={MOVE_MODE_ALL_PRODUCT} setMode={setMode} text={'Full product move mode'} />
                 <ChangeModeButton currentMode={mode} setMessage={setMessage} targetMode={MOVE_MODE_ALL_CONTAINER} setMode={setMode} text={'Full container move mode'} />
+
+                <ChangeModeButton currentMode={mode} setMessage={setMessage} targetMode={MOVE_CLEAR_CONTAINER} setMode={setMode} text={'Clear container mode'} />
             </div>
         </ShowModal>
 
